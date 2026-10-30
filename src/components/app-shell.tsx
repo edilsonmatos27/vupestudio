@@ -214,7 +214,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex size-9 items-center justify-center rounded-full bg-gradient-primary font-display text-sm font-bold text-primary-foreground"
+                className="flex size-9 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground"
                 aria-label="Menu da conta"
               >
                 {initials}

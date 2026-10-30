@@ -73,10 +73,7 @@ function Landing() {
               <Layers className="size-3.5 text-primary" /> Estúdio de imagens com IA
             </span>
             <h1 className="mt-5 text-4xl font-bold leading-[1.05] sm:text-6xl">
-              Da ideia à arte final,{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                no mesmo estúdio.
-              </span>
+              Da ideia à arte final, <span className="text-primary">no mesmo estúdio.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Invente imagens, edite fotos, monte composições com seus produtos e logomarca e
@@ -95,7 +92,7 @@ function Landing() {
             </p>
           </div>
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-primary opacity-20 blur-3xl" />
+            <div className="absolute -inset-6 rounded-[2.5rem] bg-primary opacity-[0.06] blur-3xl" />
             <div className="hero-art relative rounded-[2rem] border shadow-soft">
               <img
                 src={heroImg}
@@ -139,7 +136,7 @@ function Landing() {
           {plans.data?.map((p) => (
             <div
               key={p.id}
-              className={`flex flex-col rounded-3xl border bg-panel p-6 shadow-soft ${p.highlight ? "ring-2 ring-primary" : ""}`}
+              className={`flex flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
             >
               {p.highlight && (
                 <span className="mb-3 self-start rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">

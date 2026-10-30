@@ -100,7 +100,7 @@ function Dashboard() {
 
   return (
     <div>
-      <div className="mb-8 overflow-hidden rounded-3xl border bg-card bg-hero p-6 shadow-soft sm:p-8">
+      <div className="panel-featured mb-8 overflow-hidden rounded-3xl p-6 sm:p-8">
         <p className="text-sm text-muted-foreground">
           {hello}
           {firstName ? `, ${firstName}` : ""}
@@ -134,7 +134,7 @@ function Dashboard() {
               to={s.to}
               className="flex items-center gap-3 rounded-2xl border bg-panel p-4 transition-transform hover:-translate-y-0.5"
             >
-              <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
+              <div className="flex size-10 items-center justify-center rounded-xl border bg-secondary text-primary">
                 <s.icon className="size-5" />
               </div>
               <div>

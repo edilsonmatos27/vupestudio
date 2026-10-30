@@ -23,7 +23,7 @@ export function BrandMark({
       {data?.logo_url ? (
         <img src={data.logo_url} alt={name} className="size-9 rounded-xl object-contain" />
       ) : (
-        <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-primary font-display text-lg font-bold text-primary-foreground shadow-glow">
+        <div className="flex size-9 items-center justify-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-sm">
           V
         </div>
       )}
