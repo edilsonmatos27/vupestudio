@@ -332,7 +332,7 @@ function AdminAgents() {
                         }
                         setUploading(true);
                         try {
-                          setEdit({ ...edit, image_url: await uploadMedia(f) });
+                          setEdit({ ...edit, image_url: await uploadMedia(f, "agent") });
                         } catch (er) {
                           toast.error(errorMessage(er));
                         } finally {
@@ -351,6 +351,7 @@ function AdminAgents() {
                     </Button>
                   )}
                 </div>
+                <p className="text-xs text-muted-foreground">PNG, JPG ou WEBP, até 10 MB.</p>
               </div>
               <div className="space-y-1.5">
                 <Label>Planos com acesso (nenhum marcado = todos)</Label>

@@ -41,9 +41,10 @@ export async function uploadAsset(
   return json as UploadedAsset;
 }
 
-export async function uploadMedia(file: File): Promise<string> {
+export async function uploadMedia(file: File, purpose?: "agent"): Promise<string> {
   const form = new FormData();
   form.append("file", file);
+  if (purpose) form.append("purpose", purpose);
   const res = await fetch("/api/admin/media", {
     method: "POST",
     headers: { Authorization: `Bearer ${await token()}` },
