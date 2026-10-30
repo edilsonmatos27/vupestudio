@@ -164,6 +164,7 @@ export type Database = {
           operation_item_id: string | null
           parent_asset_id: string | null
           project_id: string | null
+          purged_at: string | null
           role: string | null
           size_bytes: number
           storage_path: string
@@ -180,6 +181,7 @@ export type Database = {
           operation_item_id?: string | null
           parent_asset_id?: string | null
           project_id?: string | null
+          purged_at?: string | null
           role?: string | null
           size_bytes: number
           storage_path: string
@@ -196,6 +198,7 @@ export type Database = {
           operation_item_id?: string | null
           parent_asset_id?: string | null
           project_id?: string | null
+          purged_at?: string | null
           role?: string | null
           size_bytes?: number
           storage_path?: string
@@ -973,6 +976,17 @@ export type Database = {
           _uid: string
         }
         Returns: Json
+      }
+      apply_invoice_credits: {
+        Args: {
+          _billing_reason: string
+          _invoice: string
+          _period_end: string
+          _period_start: string
+          _plan_credits: number
+          _sub: string
+        }
+        Returns: string
       }
       consume_reservation: { Args: { _res: string }; Returns: boolean }
       credit_balance: {
