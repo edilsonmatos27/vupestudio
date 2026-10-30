@@ -40,12 +40,12 @@ function Profile() {
     }
   };
   const changePw = async () => {
-    if (pw.next.length < 8) return toast.error("A nova senha precisa de ao menos 8 caracteres.");
-    if (pw.next !== pw.confirm) return toast.error("As senhas não coincidem.");
+    if (pw.next.length < 8) { toast.error("A nova senha precisa de ao menos 8 caracteres."); return; }
+    if (pw.next !== pw.confirm) { toast.error("As senhas não coincidem."); return; }
     setPwBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw.next, current_password: pw.current } as never);
     setPwBusy(false);
-    if (error) return toast.error(error.message.toLowerCase().includes("current") ? "Senha atual incorreta." : "Não foi possível alterar a senha.");
+    if (error) { toast.error(error.message.toLowerCase().includes("current") ? "Senha atual incorreta." : "Não foi possível alterar a senha."); return; }
     toast.success("Senha alterada.");
     setPw({ current: "", next: "", confirm: "" });
   };

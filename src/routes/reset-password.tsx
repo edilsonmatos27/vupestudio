@@ -42,12 +42,12 @@ function Reset() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password.length < 8) return setError("A senha precisa de ao menos 8 caracteres.");
-    if (password !== confirm) return setError("As senhas não coincidem.");
+    if (password.length < 8) { setError("A senha precisa de ao menos 8 caracteres."); return; }
+    if (password !== confirm) { setError("As senhas não coincidem."); return; }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) return setError("Não foi possível alterar a senha. Solicite um novo link.");
+    if (error) { setError("Não foi possível alterar a senha. Solicite um novo link."); return; }
     navigate({ to: "/painel" });
   };
 

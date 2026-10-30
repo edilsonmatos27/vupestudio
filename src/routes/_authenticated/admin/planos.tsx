@@ -53,7 +53,7 @@ function AdminPlans() {
     if (!form) return;
     const priceStr = form.price.trim().replace(/\./g, "").replace(",", ".");
     const price = priceStr === "" ? null : Math.round(Number(priceStr) * 100);
-    if (price !== null && (!Number.isFinite(price) || price < 0)) return toast.error("Preço inválido.");
+    if (price !== null && (!Number.isFinite(price) || price < 0)) { toast.error("Preço inválido."); return; }
     setBusy("save");
     try {
       const r = await adminSavePlan({

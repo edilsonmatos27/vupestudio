@@ -48,7 +48,7 @@ function Branding() {
   const upload = async (field: "logo_url" | "favicon_url", f?: File) => {
     if (!f) return;
     const err = validateImageFile(f);
-    if (err) return toast.error(err);
+    if (err) { toast.error(err); return; }
     setBusy(field);
     try { setForm((x) => ({ ...x, [field]: null })); const url = await uploadMedia(f); setForm((x) => ({ ...x, [field]: url })); } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(null); }
   };

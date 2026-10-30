@@ -65,7 +65,7 @@ function Vectorize() {
   }, [source]);
 
   const run = async () => {
-    if (!file[0]) return setError("Envie um arquivo PNG, JPG ou WEBP.");
+    if (!file[0]) { setError("Envie um arquivo PNG, JPG ou WEBP."); return; }
     setError(null);
     setResult(null);
     setStatus("authorizing");

@@ -63,7 +63,7 @@ function AdminAgents() {
   const [toggling, setToggling] = useState<string | null>(null);
 
   const open = async (a?: Agent) => {
-    if (!a) return setEdit({ ...empty });
+    if (!a) { setEdit({ ...empty }); return; }
     try {
       const { base_prompt } = await adminGetAgentPrompt({ data: { id: a.id } });
       setEdit({ id: a.id, name: a.name, public_description: a.public_description, image_url: a.image_url, purpose: a.purpose as "invent" | "create", base_prompt, allowed_plan_ids: a.allowed_plan_ids });
@@ -167,7 +167,7 @@ function AdminAgents() {
                       e.target.value = "";
                       if (!f) return;
                       const err = validateImageFile(f);
-                      if (err) return toast.error(err);
+                      if (err) { toast.error(err); return; }
                       setUploading(true);
                       try { setEdit({ ...edit, image_url: await uploadMedia(f) }); } catch (er) { toast.error(errorMessage(er)); } finally { setUploading(false); }
                     }} />

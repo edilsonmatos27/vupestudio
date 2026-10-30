@@ -87,9 +87,9 @@ export function Workbench({ mode, agentId, sourceAssetId, initialTask }: { mode:
 
   const submit = async () => {
     setError(null);
-    if (task === "edit" && !main.length) return setError("Envie a imagem principal para editar.");
-    if (task === "variation" && !source) return setError("Selecione a imagem para gerar variações (envie abaixo).");
-    if (itemCount > maxBatch) return setError(`Seu plano permite até ${maxBatch} resultado(s) por operação.`);
+    if (task === "edit" && !main.length) { setError("Envie a imagem principal para editar."); return; }
+    if (task === "variation" && !source) { setError("Selecione a imagem para gerar variações (envie abaixo)."); return; }
+    if (itemCount > maxBatch) { setError(`Seu plano permite até ${maxBatch} resultado(s) por operação.`); return; }
     setSubmitting(true);
     try {
       const res = await createOperation({

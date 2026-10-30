@@ -44,9 +44,9 @@ function Signup() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!planId || !plans.data?.some((p) => p.id === planId)) return setError("Escolha um plano para continuar.");
+    if (!planId || !plans.data?.some((p) => p.id === planId)) { setError("Escolha um plano para continuar."); return; }
     const parsed = schema.safeParse(form);
-    if (!parsed.success) return setError(parsed.error.issues[0]!.message);
+    if (!parsed.success) { setError(parsed.error.issues[0]!.message); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: parsed.data.email,
