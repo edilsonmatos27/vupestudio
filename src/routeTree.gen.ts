@@ -16,6 +16,8 @@ import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAgentesRouteImport } from './routes/_authenticated/agentes'
+import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedInventarRouteImport } from './routes/_authenticated/inventar'
@@ -58,6 +60,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAgentesRoute = AuthenticatedAgentesRouteImport.update({
+  id: '/agentes',
+  path: '/agentes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCreditosRoute = AuthenticatedCreditosRouteImport.update({
+  id: '/creditos',
+  path: '/creditos',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
   id: '/criar',
@@ -108,6 +120,8 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/agentes': typeof AuthenticatedAgentesRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
@@ -124,6 +138,8 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/agentes': typeof AuthenticatedAgentesRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
@@ -142,6 +158,8 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/agentes': typeof AuthenticatedAgentesRoute
+  '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/inventar': typeof AuthenticatedInventarRoute
@@ -160,6 +178,8 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/agentes'
+    | '/creditos'
     | '/criar'
     | '/historico'
     | '/inventar'
@@ -176,6 +196,8 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/agentes'
+    | '/creditos'
     | '/criar'
     | '/historico'
     | '/inventar'
@@ -193,6 +215,8 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/_authenticated/agentes'
+    | '/_authenticated/creditos'
     | '/_authenticated/criar'
     | '/_authenticated/historico'
     | '/_authenticated/inventar'
@@ -268,6 +292,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/agentes': {
+      id: '/_authenticated/agentes'
+      path: '/agentes'
+      fullPath: '/agentes'
+      preLoaderRoute: typeof AuthenticatedAgentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creditos': {
+      id: '/_authenticated/creditos'
+      path: '/creditos'
+      fullPath: '/creditos'
+      preLoaderRoute: typeof AuthenticatedCreditosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/criar': {
       id: '/_authenticated/criar'
       path: '/criar'
@@ -328,6 +366,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgentesRoute: typeof AuthenticatedAgentesRoute
+  AuthenticatedCreditosRoute: typeof AuthenticatedCreditosRoute
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedInventarRoute: typeof AuthenticatedInventarRoute
@@ -335,6 +375,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgentesRoute: AuthenticatedAgentesRoute,
+  AuthenticatedCreditosRoute: AuthenticatedCreditosRoute,
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedInventarRoute: AuthenticatedInventarRoute,
