@@ -12,8 +12,9 @@ export const Route = createFileRoute("/api/admin/media")({
           const form = await request.formData();
           const file = form.get("file");
           if (!(file instanceof File)) throw new U.AppError("bad_request", "Arquivo ausente.");
-          if (file.size > 2 * 1024 * 1024)
-            throw new U.AppError("too_large", "Imagem acima de 2 MB.");
+          const { mediaSizeError } = await import("@/lib/media-limits");
+          const sizeErr = mediaSizeError(file.size, form.get("purpose"));
+          if (sizeErr) throw new U.AppError("too_large", sizeErr);
           const bytes = new Uint8Array(await file.arrayBuffer());
           const mime = U.detectImageMime(bytes);
           if (!mime) throw new U.AppError("bad_type", "Use PNG, JPG ou WEBP.");
