@@ -197,7 +197,7 @@ export function Workbench({
         </div>
       )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
-        <div className="space-y-5 rounded-3xl border bg-card p-5 shadow-soft">
+        <div className="space-y-5 rounded-3xl border bg-panel p-5 shadow-soft">
           {mode === "create" && (
             <Tabs value={task} onValueChange={(v) => setTask(v as Task)}>
               <TabsList className="grid w-full grid-cols-3">

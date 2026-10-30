@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/painel")({
 
 function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded-3xl border bg-card p-5 shadow-soft">
+    <div className="rounded-3xl border bg-panel p-5 shadow-soft">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="mt-1 font-display text-3xl font-bold">{value}</p>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
@@ -132,7 +132,7 @@ function Dashboard() {
             <Link
               key={s.to}
               to={s.to}
-              className="flex items-center gap-3 rounded-2xl border bg-card p-4 transition-transform hover:-translate-y-0.5"
+              className="flex items-center gap-3 rounded-2xl border bg-panel p-4 transition-transform hover:-translate-y-0.5"
             >
               <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
                 <s.icon className="size-5" />
@@ -229,7 +229,7 @@ function Dashboard() {
                     key={p.id}
                     to="/projetos/$id"
                     params={{ id: p.id }}
-                    className="flex items-center gap-3 rounded-2xl border bg-card p-3 text-sm hover:bg-secondary"
+                    className="flex items-center gap-3 rounded-2xl border bg-panel p-3 text-sm hover:bg-secondary"
                   >
                     <FolderOpen className="size-4 text-primary" />{" "}
                     <span className="flex-1 truncate font-medium">{p.name}</span>

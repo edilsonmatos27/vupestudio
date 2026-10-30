@@ -64,12 +64,13 @@ const SUB_ITEMS: Item[] = [
 ];
 
 function useTheme() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   useEffect(() => setDark(document.documentElement.classList.contains("dark")), []);
   const toggle = () => {
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
+    document.documentElement.classList.toggle("light", !next);
     try {
       localStorage.setItem("vupe-theme", next ? "dark" : "light");
     } catch {}
@@ -100,7 +101,7 @@ function NavList({
             title={collapsed ? it.label : undefined}
             className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                ? "bg-nav-active text-sidebar-accent-foreground"
                 : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
             } ${collapsed ? "justify-center px-2" : ""}`}
           >
@@ -146,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-3 transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
+        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
       >
         <div
           className={`mb-6 flex items-center px-2 pt-2 ${collapsed ? "justify-center" : "justify-between"}`}
@@ -174,7 +175,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-72 border-sidebar-border bg-sidebar p-4">
+        <SheetContent
+          side="left"
+          className="w-72 border-sidebar-border bg-sidebar bg-sidebar-gradient p-4"
+        >
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="mb-6 px-2 pt-1">
             <BrandMark inverted />

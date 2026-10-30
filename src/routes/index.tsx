@@ -96,13 +96,15 @@ function Landing() {
           </div>
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-primary opacity-20 blur-3xl" />
-            <img
-              src={heroImg}
-              alt="Composição de produtos, amostras de cor e esboço vetorial"
-              className="relative aspect-[3/2] w-full rounded-[2rem] border object-cover shadow-soft"
-              width={1536}
-              height={1024}
-            />
+            <div className="hero-art relative rounded-[2rem] border shadow-soft">
+              <img
+                src={heroImg}
+                alt="Composição de produtos, amostras de cor e esboço vetorial"
+                className="aspect-[3/2] w-full object-cover"
+                width={1536}
+                height={1024}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -110,7 +112,7 @@ function Landing() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURE_CARDS.map((f) => (
-            <div key={f.title} className="rounded-3xl border bg-card p-6 shadow-soft">
+            <div key={f.title} className="rounded-3xl border bg-panel p-6 shadow-soft">
               <div className="flex size-11 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                 <f.icon className="size-5" />
               </div>
@@ -137,7 +139,7 @@ function Landing() {
           {plans.data?.map((p) => (
             <div
               key={p.id}
-              className={`flex flex-col rounded-3xl border bg-card p-6 shadow-soft ${p.highlight ? "ring-2 ring-primary" : ""}`}
+              className={`flex flex-col rounded-3xl border bg-panel p-6 shadow-soft ${p.highlight ? "ring-2 ring-primary" : ""}`}
             >
               {p.highlight && (
                 <span className="mb-3 self-start rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
