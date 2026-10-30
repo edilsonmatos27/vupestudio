@@ -17,7 +17,9 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
+import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedInventarRouteImport } from './routes/_authenticated/inventar'
+import { Route as AuthenticatedVetorizarRouteImport } from './routes/_authenticated/vetorizar'
 import { Route as ApiAdminMediaRouteImport } from './routes/api/admin/media'
 import { Route as ApiAssetsUploadRouteImport } from './routes/api/assets/upload'
 import { Route as ApiPublicMediaNameRouteImport } from './routes/api/public/media.$name'
@@ -62,9 +64,19 @@ const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
   path: '/criar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInventarRoute = AuthenticatedInventarRouteImport.update({
   id: '/inventar',
   path: '/inventar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVetorizarRoute = AuthenticatedVetorizarRouteImport.update({
+  id: '/vetorizar',
+  path: '/vetorizar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiAdminMediaRoute = ApiAdminMediaRouteImport.update({
@@ -97,7 +109,9 @@ export interface FileRoutesByFullPath {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/criar': typeof AuthenticatedCriarRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
+  '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
@@ -111,7 +125,9 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/criar': typeof AuthenticatedCriarRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
+  '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
@@ -127,7 +143,9 @@ export interface FileRoutesById {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
+  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/inventar': typeof AuthenticatedInventarRoute
+  '/_authenticated/vetorizar': typeof AuthenticatedVetorizarRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
@@ -143,7 +161,9 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/reset-password'
     | '/criar'
+    | '/historico'
     | '/inventar'
+    | '/vetorizar'
     | '/api/admin/media'
     | '/api/assets/upload'
     | '/api/public/media/$name'
@@ -157,7 +177,9 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/reset-password'
     | '/criar'
+    | '/historico'
     | '/inventar'
+    | '/vetorizar'
     | '/api/admin/media'
     | '/api/assets/upload'
     | '/api/public/media/$name'
@@ -172,7 +194,9 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/reset-password'
     | '/_authenticated/criar'
+    | '/_authenticated/historico'
     | '/_authenticated/inventar'
+    | '/_authenticated/vetorizar'
     | '/api/admin/media'
     | '/api/assets/upload'
     | '/api/public/media/$name'
@@ -251,11 +275,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCriarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/historico': {
+      id: '/_authenticated/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inventar': {
       id: '/_authenticated/inventar'
       path: '/inventar'
       fullPath: '/inventar'
       preLoaderRoute: typeof AuthenticatedInventarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vetorizar': {
+      id: '/_authenticated/vetorizar'
+      path: '/vetorizar'
+      fullPath: '/vetorizar'
+      preLoaderRoute: typeof AuthenticatedVetorizarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/admin/media': {
@@ -291,12 +329,16 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
+  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedInventarRoute: typeof AuthenticatedInventarRoute
+  AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
+  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedInventarRoute: AuthenticatedInventarRoute,
+  AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
