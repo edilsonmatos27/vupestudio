@@ -6,7 +6,11 @@ export const getRouter = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: (count, error) => count < 1 && !/restrit|Unauthorized|Forbidden|não encontrad/i.test(String((error as Error)?.message ?? "")),
+        retry: (count, error) =>
+          count < 1 &&
+          !/restrit|Unauthorized|Forbidden|não encontrad/i.test(
+            String((error as Error)?.message ?? ""),
+          ),
       },
     },
   });

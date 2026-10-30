@@ -22,9 +22,14 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
-        <p className="mt-2 text-sm text-muted-foreground">A página que você procura não existe ou foi movida.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          A página que você procura não existe ou foi movida.
+        </p>
         <div className="mt-6">
-          <Link to="/" className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          >
             Ir para o início
           </Link>
         </div>
@@ -42,8 +47,12 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Esta página não carregou</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Algo deu errado. Tente novamente ou volte ao início.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Esta página não carregou
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Algo deu errado. Tente novamente ou volte ao início.
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -54,7 +63,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           >
             Tentar novamente
           </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold text-foreground">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold text-foreground"
+          >
             Início
           </a>
         </div>
@@ -69,16 +81,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Vupe Studio — criação e edição de imagens com IA" },
-      { name: "description", content: "Crie, edite, componha e vetorize imagens com agentes de IA no Vupe Studio." },
+      {
+        name: "description",
+        content: "Crie, edite, componha e vetorize imagens com agentes de IA no Vupe Studio.",
+      },
       { property: "og:title", content: "Vupe Studio" },
-      { property: "og:description", content: "Crie, edite, componha e vetorize imagens com agentes de IA." },
+      {
+        property: "og:description",
+        content: "Crie, edite, componha e vetorize imagens com agentes de IA.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -109,7 +130,11 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function BrandingEffects() {
-  const { data } = useQuery({ queryKey: ["branding"], queryFn: () => getPublicBranding(), staleTime: 60_000 });
+  const { data } = useQuery({
+    queryKey: ["branding"],
+    queryFn: () => getPublicBranding(),
+    staleTime: 60_000,
+  });
   useEffect(() => {
     if (!data?.favicon_url) return;
     let link = document.querySelector<HTMLLinkElement>("link[rel='icon']");

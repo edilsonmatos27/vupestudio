@@ -2,10 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { getPublicBranding } from "@/functions/account.functions";
 
 export function useBranding() {
-  return useQuery({ queryKey: ["branding"], queryFn: () => getPublicBranding(), staleTime: 60_000 });
+  return useQuery({
+    queryKey: ["branding"],
+    queryFn: () => getPublicBranding(),
+    staleTime: 60_000,
+  });
 }
 
-export function BrandMark({ collapsed = false, inverted = false }: { collapsed?: boolean; inverted?: boolean }) {
+export function BrandMark({
+  collapsed = false,
+  inverted = false,
+}: {
+  collapsed?: boolean;
+  inverted?: boolean;
+}) {
   const { data } = useBranding();
   const name = data?.display_name ?? "Vupe Studio";
   return (
@@ -17,7 +27,13 @@ export function BrandMark({ collapsed = false, inverted = false }: { collapsed?:
           V
         </div>
       )}
-      {!collapsed && <span className={`whitespace-nowrap font-display text-lg font-bold tracking-tight ${inverted ? "text-sidebar-foreground" : ""}`}>{name}</span>}
+      {!collapsed && (
+        <span
+          className={`whitespace-nowrap font-display text-lg font-bold tracking-tight ${inverted ? "text-sidebar-foreground" : ""}`}
+        >
+          {name}
+        </span>
+      )}
     </div>
   );
 }

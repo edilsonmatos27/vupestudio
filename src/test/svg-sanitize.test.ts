@@ -10,16 +10,32 @@ describe("sanitizeSvg", () => {
     expect(r.svg).toContain("<path");
   });
   it("rejects scripts", () => {
-    expect(() => sanitizeSvg(`<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><path d="M0 0"/></svg>`)).toThrow();
+    expect(() =>
+      sanitizeSvg(
+        `<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><path d="M0 0"/></svg>`,
+      ),
+    ).toThrow();
   });
   it("rejects event handlers", () => {
-    expect(() => sanitizeSvg(`<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><path d="M0 0"/></svg>`)).toThrow();
+    expect(() =>
+      sanitizeSvg(
+        `<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><path d="M0 0"/></svg>`,
+      ),
+    ).toThrow();
   });
   it("rejects embedded bitmaps (<image>)", () => {
-    expect(() => sanitizeSvg(`<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/png;base64,AAAA"/></svg>`)).toThrow();
+    expect(() =>
+      sanitizeSvg(
+        `<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/png;base64,AAAA"/></svg>`,
+      ),
+    ).toThrow();
   });
   it("rejects external references in attribute values", () => {
-    expect(() => sanitizeSvg(`<svg xmlns="http://www.w3.org/2000/svg"><path fill="url(http://x/y)" d="M0 0"/></svg>`)).toThrow();
+    expect(() =>
+      sanitizeSvg(
+        `<svg xmlns="http://www.w3.org/2000/svg"><path fill="url(http://x/y)" d="M0 0"/></svg>`,
+      ),
+    ).toThrow();
   });
   it("rejects an SVG without vector shapes", () => {
     expect(() => sanitizeSvg(`<svg xmlns="http://www.w3.org/2000/svg"><g></g></svg>`)).toThrow();

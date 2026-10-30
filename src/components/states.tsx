@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 
 export function LoadingState({ label = "Carregando…" }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-16 text-muted-foreground" role="status">
+    <div
+      className="flex items-center justify-center gap-3 py-16 text-muted-foreground"
+      role="status"
+    >
       <Loader2 className="size-5 animate-spin text-primary" />
       <span className="text-sm">{label}</span>
     </div>
@@ -25,20 +28,42 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
   );
 }
 
-export function EmptyState({ title, description, action, icon }: { title: string; description?: string; action?: ReactNode; icon?: ReactNode }) {
+export function EmptyState({
+  title,
+  description,
+  action,
+  icon,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  icon?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed bg-card/50 px-6 py-14 text-center">
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">{icon ?? <Inbox className="size-5" />}</div>
+      <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
+        {icon ?? <Inbox className="size-5" />}
+      </div>
       <div>
         <p className="font-display font-semibold">{title}</p>
-        {description && <p className="mt-1 max-w-md text-sm text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">{description}</p>
+        )}
       </div>
       {action}
     </div>
   );
 }
 
-export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
@@ -79,5 +104,11 @@ export function StatusBadge({ status }: { status: string }) {
     admin: ["Admin master", "bg-primary/15 text-primary"],
   };
   const [label, cls] = map[status] ?? [status, "bg-secondary text-secondary-foreground"];
-  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}
+    >
+      {label}
+    </span>
+  );
 }

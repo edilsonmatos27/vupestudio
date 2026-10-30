@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { errorMessage, uploadAsset, validateImageFile, type UploadedAsset } from "@/lib/client-api";
 
 export function UploadZone({
-  label, hint, role, max, value, onChange, transparentPreview, disabled,
+  label,
+  hint,
+  role,
+  max,
+  value,
+  onChange,
+  transparentPreview,
+  disabled,
 }: {
   label: string;
   hint?: string;
@@ -50,12 +57,17 @@ export function UploadZone({
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
         <p className="text-sm font-semibold">{label}</p>
-        <span className="text-xs text-muted-foreground">{value.length}/{max}</span>
+        <span className="text-xs text-muted-foreground">
+          {value.length}/{max}
+        </span>
       </div>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       <div className="flex flex-wrap gap-2">
         {value.map((a) => (
-          <div key={a.id} className={`relative size-20 overflow-hidden rounded-xl border ${transparentPreview ? "bg-checker" : "bg-muted"}`}>
+          <div
+            key={a.id}
+            className={`relative size-20 overflow-hidden rounded-xl border ${transparentPreview ? "bg-checker" : "bg-muted"}`}
+          >
             {a.url && <img src={a.url} alt={a.filename} className="size-full object-contain" />}
             <button
               type="button"
