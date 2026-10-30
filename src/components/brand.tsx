@@ -17,7 +17,7 @@ export function BrandMark({ collapsed = false, inverted = false }: { collapsed?:
           V
         </div>
       )}
-      {!collapsed && <span className={`font-display text-lg font-bold tracking-tight ${inverted ? "text-sidebar-foreground" : ""}`}>{name}</span>}
+      {!collapsed && <span className={`whitespace-nowrap font-display text-lg font-bold tracking-tight ${inverted ? "text-sidebar-foreground" : ""}`}>{name}</span>}
     </div>
   );
 }
