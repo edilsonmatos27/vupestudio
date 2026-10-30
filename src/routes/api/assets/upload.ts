@@ -58,6 +58,22 @@ export const Route = createFileRoute("/api/assets/upload")({
             await db.storage.from("vupe-assets").remove([path]);
             throw new U.AppError("db", "Falha ao registrar o arquivo.", 500);
           }
+          if (kind === "overlay") {
+            // Register the deterministic overlay as its own history entry (no credits charged).
+            const { data: op } = await db
+              .from("operations")
+              .insert({ user_id: userId, project_id: projectId, type: "logo_overlay", status: "succeeded", model: "composição determinística", params: { parent_asset_id: parentId }, input_asset_ids: parentId ? [parentId] : [], requested_count: 1, credits_per_item: 0, charged: false, idempotency_key: `overlay:${id}` })
+              .select("id")
+              .single();
+            if (op) {
+              const { data: item } = await db
+                .from("operation_items")
+                .insert({ operation_id: op.id, user_id: userId, idx: 0, status: "succeeded", asset_id: id, source_asset_id: parentId, finished_at: new Date().toISOString() })
+                .select("id")
+                .single();
+              await db.from("assets").update({ operation_id: op.id, operation_item_id: item?.id ?? null }).eq("id", id);
+            }
+          }
           return Response.json({ id, mime, url: await U.signedUrl(path), filename: safeName });
         } catch (e) {
           return U.jsonError(e);
