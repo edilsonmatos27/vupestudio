@@ -22,7 +22,7 @@ export function useDownload() {
   return { download, busy };
 }
 
-export function Lightbox({ open, onOpenChange, src, title, assetId, transparentBg }: { open: boolean; onOpenChange: (o: boolean) => void; src: string | null; title?: string; assetId?: string; transparentBg?: boolean }) {
+export function Lightbox({ open, onOpenChange, src, title, assetId, transparentBg }: { open: boolean; onOpenChange: (o: boolean) => void; src: string | null; title?: string | undefined; assetId?: string | undefined; transparentBg?: boolean | undefined }) {
   const { download, busy } = useDownload();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

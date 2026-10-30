@@ -44,7 +44,7 @@ function CreditsView({ data }: { data: CreditsData & { nextGrant?: { at: string;
         {!data.buckets.length ? <p className="text-sm text-muted-foreground">Nenhuma concessão ainda.</p> : (
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="text-left text-muted-foreground"><tr><th className="py-2">Origem</th><th>Concedido</th><th>Restante</th><th>Expira</th><th>Data</th></tr></thead>
-            <tbody>{data.buckets.map((b) => <tr key={b.id} className="border-t"><td className="py-2">{SOURCE[b.source] ?? b.source}</td><td>{b.granted}</td><td>{b.remaining}</td><td>{b.expires_at ? formatDate(b.expires_at) : "Não expira"}</td><td>{formatDate(b.created_at)}</td></tr>)}</tbody>
+            <tbody>{data.buckets.map((b: any) => <tr key={b.id} className="border-t"><td className="py-2">{SOURCE[b.source] ?? b.source}</td><td>{b.granted}</td><td>{b.remaining}</td><td>{b.expires_at ? formatDate(b.expires_at) : "Não expira"}</td><td>{formatDate(b.created_at)}</td></tr>)}</tbody>
           </table></div>
         )}
         <p className="mt-3 text-xs text-muted-foreground">Franquias de assinatura não acumulam entre ciclos. Créditos de teste não migram para o período pago. Créditos manuais não expiram.</p>
@@ -54,7 +54,7 @@ function CreditsView({ data }: { data: CreditsData & { nextGrant?: { at: string;
         {!data.ledger.length ? <p className="text-sm text-muted-foreground">Sem movimentações.</p> : (
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead className="text-left text-muted-foreground"><tr><th className="py-2">Data</th><th>Tipo</th><th>Quantidade</th><th>Motivo</th></tr></thead>
-            <tbody>{data.ledger.map((l) => <tr key={l.id} className="border-t"><td className="py-2 whitespace-nowrap">{formatDate(l.created_at)}</td><td>{KIND[l.kind] ?? l.kind}</td><td className={l.delta > 0 ? "text-success" : l.delta < 0 ? "text-destructive" : ""}>{l.delta > 0 ? `+${l.delta}` : l.delta}</td><td className="text-muted-foreground">{l.reason}</td></tr>)}</tbody>
+            <tbody>{data.ledger.map((l: any) => <tr key={l.id} className="border-t"><td className="py-2 whitespace-nowrap">{formatDate(l.created_at)}</td><td>{KIND[l.kind] ?? l.kind}</td><td className={l.delta > 0 ? "text-success" : l.delta < 0 ? "text-destructive" : ""}>{l.delta > 0 ? `+${l.delta}` : l.delta}</td><td className="text-muted-foreground">{l.reason}</td></tr>)}</tbody>
           </table></div>
         )}
       </div>

@@ -62,7 +62,7 @@ function buildRequest(model: ModelInfo, prompt: string, images: InputImage[], pa
       form.set("background", "transparent");
       form.set("output_format", "png");
     }
-    for (const img of images) form.append("image[]", new File([img.bytes], img.name, { type: img.mime }));
+    for (const img of images) form.append("image[]", new File([img.bytes as Uint8Array<ArrayBuffer>], img.name, { type: img.mime }));
     if (stream) {
       form.set("stream", "true");
       form.set("partial_images", "1");

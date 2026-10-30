@@ -38,7 +38,7 @@ export type Op = {
   items: OpItem[];
 };
 
-export function OperationCard({ op, projects }: { op: Op; projects?: { id: string; name: string }[] }) {
+export function OperationCard({ op, projects }: { op: Op; projects?: { id: string; name: string }[] | undefined }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { download, busy } = useDownload();

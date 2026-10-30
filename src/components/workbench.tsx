@@ -20,7 +20,7 @@ import { useMe } from "@/hooks/use-me";
 
 type Mode = "invent" | "create";
 
-export function Workbench({ mode, agentId, sourceAssetId, initialTask }: { mode: Mode; agentId?: string; sourceAssetId?: string; initialTask?: "edit" | "compose" | "variation" }) {
+export function Workbench({ mode, agentId, sourceAssetId, initialTask }: { mode: Mode; agentId?: string | undefined; sourceAssetId?: string | undefined; initialTask?: "edit" | "compose" | "variation" | undefined }) {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const opts = useQuery({ queryKey: ["studio-options"], queryFn: () => studioOptions() });
