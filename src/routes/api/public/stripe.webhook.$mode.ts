@@ -18,7 +18,11 @@ export const Route = createFileRoute("/api/public/stripe/webhook/$mode")({
           return new Response("Not configured", { status: 503 });
         }
         if (!secrets.webhookSecret) return new Response("Not configured", { status: 503 });
-        const valid = await S.verifyWebhookSignature(raw, request.headers.get("stripe-signature"), secrets.webhookSecret);
+        const valid = await S.verifyWebhookSignature(
+          raw,
+          request.headers.get("stripe-signature"),
+          secrets.webhookSecret,
+        );
         if (!valid) return new Response("Invalid signature", { status: 400 });
 
         let event: any;
@@ -27,17 +31,30 @@ export const Route = createFileRoute("/api/public/stripe/webhook/$mode")({
         } catch {
           return new Response("Invalid payload", { status: 400 });
         }
-        if (!!event.livemode !== (mode === "live")) return new Response("Mode mismatch", { status: 400 });
+        if (!!event.livemode !== (mode === "live"))
+          return new Response("Mode mismatch", { status: 400 });
 
         const db = U.supabaseAdmin;
-        await db.from("stripe_credentials").update({ webhook_validated_at: new Date().toISOString() }).eq("mode", mode);
-        const { data: existing } = await db.from("stripe_events").select("status").eq("id", event.id).maybeSingle();
-        if (existing?.status === "processed") return Response.json({ received: true, duplicate: true });
-        if (!existing) await db.from("stripe_events").insert({ id: event.id, mode, type: event.type });
+        await db
+          .from("stripe_credentials")
+          .update({ webhook_validated_at: new Date().toISOString() })
+          .eq("mode", mode);
+        const { data: existing } = await db
+          .from("stripe_events")
+          .select("status")
+          .eq("id", event.id)
+          .maybeSingle();
+        if (existing?.status === "processed")
+          return Response.json({ received: true, duplicate: true });
+        if (!existing)
+          await db.from("stripe_events").insert({ id: event.id, mode, type: event.type });
 
         try {
           await S.processStripeEvent(mode, secrets.secretKey, event);
-          await db.from("stripe_events").update({ status: "processed", processed_at: new Date().toISOString(), error: null }).eq("id", event.id);
+          await db
+            .from("stripe_events")
+            .update({ status: "processed", processed_at: new Date().toISOString(), error: null })
+            .eq("id", event.id);
           return Response.json({ received: true });
         } catch (e) {
           const msg = (e as Error).message?.slice(0, 500) ?? "error";

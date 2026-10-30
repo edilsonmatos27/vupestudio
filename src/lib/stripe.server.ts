@@ -25,7 +25,12 @@ function encode(params: Params, prefix = "", out: string[] = []) {
 
 export class StripeError extends AppError {}
 
-export async function stripeRequest<T = any>(secretKey: string, method: "GET" | "POST" | "DELETE", path: string, params?: Params): Promise<T> {
+export async function stripeRequest<T = any>(
+  secretKey: string,
+  method: "GET" | "POST" | "DELETE",
+  path: string,
+  params?: Params,
+): Promise<T> {
   let url = `https://api.stripe.com${path}`;
   const init: RequestInit = {
     method,
@@ -41,21 +46,40 @@ export async function stripeRequest<T = any>(secretKey: string, method: "GET" | 
   const res = await fetch(url, init);
   const json = (await res.json().catch(() => ({}))) as any;
   if (!res.ok) {
-    const msg = json?.error?.message ? String(json.error.message) : `Stripe respondeu ${res.status}`;
+    const msg = json?.error?.message
+      ? String(json.error.message)
+      : `Stripe respondeu ${res.status}`;
     // Never echo keys; Stripe error messages do not contain the secret but may contain a masked key.
-    throw new StripeError("stripe", msg.replace(/sk_(test|live)_[A-Za-z0-9*]+/g, "sk_***"), res.status >= 500 ? 502 : 400);
+    throw new StripeError(
+      "stripe",
+      msg.replace(/sk_(test|live)_[A-Za-z0-9*]+/g, "sk_***"),
+      res.status >= 500 ? 502 : 400,
+    );
   }
   return json as T;
 }
 
 export async function currentMode(): Promise<StripeMode> {
-  const { data } = await supabaseAdmin.from("app_settings").select("stripe_mode").eq("id", true).single();
+  const { data } = await supabaseAdmin
+    .from("app_settings")
+    .select("stripe_mode")
+    .eq("id", true)
+    .single();
   return (data?.stripe_mode as StripeMode) ?? "test";
 }
 
 export async function getStripeSecrets(mode: StripeMode) {
-  const { data } = await supabaseAdmin.from("stripe_credentials").select("*").eq("mode", mode).maybeSingle();
-  if (!data?.secret_key_enc) throw new AppError("stripe_not_configured", "A cobrança ainda não foi configurada pelo administrador.", 400);
+  const { data } = await supabaseAdmin
+    .from("stripe_credentials")
+    .select("*")
+    .eq("mode", mode)
+    .maybeSingle();
+  if (!data?.secret_key_enc)
+    throw new AppError(
+      "stripe_not_configured",
+      "A cobrança ainda não foi configurada pelo administrador.",
+      400,
+    );
   return {
     secretKey: await decryptSecret(data.secret_key_enc),
     webhookSecret: data.webhook_secret_enc ? await decryptSecret(data.webhook_secret_enc) : null,
@@ -63,7 +87,11 @@ export async function getStripeSecrets(mode: StripeMode) {
   };
 }
 
-export async function verifyWebhookSignature(payload: string, header: string | null, secret: string) {
+export async function verifyWebhookSignature(
+  payload: string,
+  header: string | null,
+  secret: string,
+) {
   if (!header) return false;
   const parts = Object.fromEntries(
     header.split(",").map((p) => {
@@ -72,7 +100,10 @@ export async function verifyWebhookSignature(payload: string, header: string | n
     }),
   ) as Record<string, string>;
   const t = parts["t"];
-  const sigs = header.split(",").filter((p) => p.startsWith("v1=")).map((p) => p.slice(3));
+  const sigs = header
+    .split(",")
+    .filter((p) => p.startsWith("v1="))
+    .map((p) => p.slice(3));
   if (!t || !sigs.length) return false;
   if (Math.abs(Date.now() / 1000 - Number(t)) > 300) return false;
   const expected = await hmacSha256Hex(secret, `${t}.${payload}`);
@@ -83,7 +114,11 @@ const ts = (s?: number | null) => (s ? new Date(s * 1000).toISOString() : null);
 
 async function planForPrice(priceId: string | null | undefined, mode: StripeMode) {
   if (!priceId) return null;
-  const { data: pp } = await supabaseAdmin.from("plan_prices").select("plan_id").eq("stripe_price_id", priceId).maybeSingle();
+  const { data: pp } = await supabaseAdmin
+    .from("plan_prices")
+    .select("plan_id")
+    .eq("stripe_price_id", priceId)
+    .maybeSingle();
   const planId = pp?.plan_id;
   if (planId) {
     const { data } = await supabaseAdmin.from("plans").select("*").eq("id", planId).single();
@@ -96,16 +131,28 @@ async function planForPrice(priceId: string | null | undefined, mode: StripeMode
 
 async function userForCustomer(customerId: string, metaUser?: string | null) {
   if (metaUser) return metaUser;
-  const { data } = await supabaseAdmin.from("stripe_customers").select("user_id").eq("stripe_customer_id", customerId).maybeSingle();
+  const { data } = await supabaseAdmin
+    .from("stripe_customers")
+    .select("user_id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
   return data?.user_id ?? null;
 }
 
 /** Pulls the authoritative subscription state from Stripe and stores it. Never grants a paid period by itself. */
-export async function syncSubscription(mode: StripeMode, secretKey: string, subscriptionId: string) {
+export async function syncSubscription(
+  mode: StripeMode,
+  secretKey: string,
+  subscriptionId: string,
+) {
   const sub = await stripeRequest(secretKey, "GET", `/v1/subscriptions/${subscriptionId}`);
   const userId = await userForCustomer(sub.customer, sub.metadata?.user_id);
   if (!userId) return null;
-  const { data: existing } = await supabaseAdmin.from("subscriptions").select("*").eq("stripe_subscription_id", sub.id).maybeSingle();
+  const { data: existing } = await supabaseAdmin
+    .from("subscriptions")
+    .select("*")
+    .eq("stripe_subscription_id", sub.id)
+    .maybeSingle();
   const priceId = sub.items?.data?.[0]?.price?.id ?? null;
   const endedAt = ts(sub.ended_at);
   let paidThrough = existing?.paid_through ?? null;
@@ -146,7 +193,9 @@ export async function syncSubscription(mode: StripeMode, secretKey: string, subs
 
 /** Confirms an invoice from Stripe; only a paid invoice extends the paid period and grants credits. */
 export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId: string) {
-  const inv = await stripeRequest(secretKey, "GET", `/v1/invoices/${invoiceId}`, { expand: ["charge"] });
+  const inv = await stripeRequest(secretKey, "GET", `/v1/invoices/${invoiceId}`, {
+    expand: ["charge"],
+  });
   const subscriptionId: string | null = inv.subscription ?? null;
   const userId = await userForCustomer(inv.customer, inv.subscription_details?.metadata?.user_id);
   const lines: any[] = inv.lines?.data ?? [];
@@ -154,8 +203,12 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
   const main = positive[positive.length - 1] ?? lines[0];
   const priceId = main?.price?.id ?? null;
   const plan = await planForPrice(priceId, mode);
-  const periodEnd = Math.max(...(positive.length ? positive : lines).map((l) => l.period?.end ?? 0));
-  const periodStart = Math.min(...(positive.length ? positive : lines).map((l) => l.period?.start ?? Infinity));
+  const periodEnd = Math.max(
+    ...(positive.length ? positive : lines).map((l) => l.period?.end ?? 0),
+  );
+  const periodStart = Math.min(
+    ...(positive.length ? positive : lines).map((l) => l.period?.start ?? Infinity),
+  );
   const charge = typeof inv.charge === "object" ? inv.charge : null;
 
   await supabaseAdmin.from("invoices").upsert(
@@ -191,9 +244,13 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
     const sub = synced.row;
     const newPaid = new Date(periodEnd * 1000);
     const update: Record<string, unknown> = { stripe_price_id: priceId };
-    if (!sub.paid_through || new Date(sub.paid_through) < newPaid) update["paid_through"] = newPaid.toISOString();
+    if (!sub.paid_through || new Date(sub.paid_through) < newPaid)
+      update["paid_through"] = newPaid.toISOString();
     if (plan) update["plan_id"] = plan.id;
-    await supabaseAdmin.from("subscriptions").update(update as never).eq("id", sub.id);
+    await supabaseAdmin
+      .from("subscriptions")
+      .update(update as never)
+      .eq("id", sub.id);
     if (plan) {
       await supabaseAdmin.rpc("apply_invoice_credits", {
         _sub: sub.id,
@@ -213,16 +270,31 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
  * revokes the remaining paid period (access_state = blocked_billing) and expires the unreserved
  * subscription credits. Partial refunds are recorded only. Every application is audited.
  */
-export async function applyChargeReversal(mode: StripeMode, secretKey: string, chargeId: string, reason: string) {
+export async function applyChargeReversal(
+  mode: StripeMode,
+  secretKey: string,
+  chargeId: string,
+  reason: string,
+) {
   const charge = await stripeRequest(secretKey, "GET", `/v1/charges/${chargeId}`);
   if (!charge.invoice) return;
   await syncInvoice(mode, secretKey, charge.invoice);
   const full = charge.refunded || charge.disputed;
   if (!full) {
-    await audit({ actor_id: null, action: "stripe_partial_refund", target_type: "invoice", target_id: charge.invoice, reason });
+    await audit({
+      actor_id: null,
+      action: "stripe_partial_refund",
+      target_type: "invoice",
+      target_id: charge.invoice,
+      reason,
+    });
     return;
   }
-  const { data: inv } = await supabaseAdmin.from("invoices").select("stripe_subscription_id, user_id").eq("stripe_invoice_id", charge.invoice).maybeSingle();
+  const { data: inv } = await supabaseAdmin
+    .from("invoices")
+    .select("stripe_subscription_id, user_id")
+    .eq("stripe_invoice_id", charge.invoice)
+    .maybeSingle();
   if (!inv?.stripe_subscription_id || !inv.user_id) return;
   await supabaseAdmin
     .from("subscriptions")
@@ -233,7 +305,13 @@ export async function applyChargeReversal(mode: StripeMode, secretKey: string, c
     _sources: ["subscription", "upgrade"],
     _reason: `Reversão de pagamento (${reason})`,
   });
-  await audit({ actor_id: null, action: "stripe_reversal_applied", target_type: "invoice", target_id: charge.invoice, reason });
+  await audit({
+    actor_id: null,
+    action: "stripe_reversal_applied",
+    target_type: "invoice",
+    target_id: charge.invoice,
+    reason,
+  });
 }
 
 export async function processStripeEvent(mode: StripeMode, secretKey: string, event: any) {
@@ -245,12 +323,16 @@ export async function processStripeEvent(mode: StripeMode, secretKey: string, ev
       if (obj.customer && obj.metadata?.user_id) {
         await supabaseAdmin
           .from("stripe_customers")
-          .upsert({ user_id: obj.metadata.user_id, mode, stripe_customer_id: obj.customer }, { onConflict: "stripe_customer_id" });
+          .upsert(
+            { user_id: obj.metadata.user_id, mode, stripe_customer_id: obj.customer },
+            { onConflict: "stripe_customer_id" },
+          );
       }
       if (obj.subscription) {
         const s = await syncSubscription(mode, secretKey, obj.subscription);
         const latest = s?.stripe?.latest_invoice;
-        if (latest) await syncInvoice(mode, secretKey, typeof latest === "string" ? latest : latest.id);
+        if (latest)
+          await syncInvoice(mode, secretKey, typeof latest === "string" ? latest : latest.id);
       }
       break;
     }

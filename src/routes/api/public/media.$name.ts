@@ -6,13 +6,24 @@ export const Route = createFileRoute("/api/public/media/$name")({
     handlers: {
       GET: async ({ params }) => {
         const name = params.name;
-        if (!/^[0-9a-f-]{36}\.(png|jpg|webp)$/.test(name)) return new Response("Not found", { status: 404 });
+        if (!/^[0-9a-f-]{36}\.(png|jpg|webp)$/.test(name))
+          return new Response("Not found", { status: 404 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.storage.from("vupe-media").download(`public/${name}`);
+        const { data, error } = await supabaseAdmin.storage
+          .from("vupe-media")
+          .download(`public/${name}`);
         if (error || !data) return new Response("Not found", { status: 404 });
-        const type = name.endsWith(".png") ? "image/png" : name.endsWith(".jpg") ? "image/jpeg" : "image/webp";
+        const type = name.endsWith(".png")
+          ? "image/png"
+          : name.endsWith(".jpg")
+            ? "image/jpeg"
+            : "image/webp";
         return new Response(data, {
-          headers: { "Content-Type": type, "Cache-Control": "public, max-age=86400, immutable", "X-Content-Type-Options": "nosniff" },
+          headers: {
+            "Content-Type": type,
+            "Cache-Control": "public, max-age=86400, immutable",
+            "X-Content-Type-Options": "nosniff",
+          },
         });
       },
     },

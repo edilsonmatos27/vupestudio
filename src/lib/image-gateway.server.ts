@@ -5,7 +5,12 @@ import { OPENAI_SIZE, type ModelInfo } from "./models";
 const BASE_URL = "https://ai.gateway.lovable.dev";
 
 export class GatewayError extends Error {
-  constructor(public status: number, public code: string, message: string, public retryable = false) {
+  constructor(
+    public status: number,
+    public code: string,
+    message: string,
+    public retryable = false,
+  ) {
     super(message);
   }
 }
@@ -16,7 +21,8 @@ export type ImageParams = { aspect?: string; quality?: string; transparent?: boo
 function b64(bytes: Uint8Array) {
   let s = "";
   const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) s += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  for (let i = 0; i < bytes.length; i += chunk)
+    s += String.fromCharCode(...bytes.subarray(i, i + chunk));
   return btoa(s);
 }
 
@@ -28,21 +34,63 @@ function apiKey() {
 
 function friendly(status: number, raw: string, code?: string): GatewayError {
   if (code === "content_policy_violation" || code === "moderation_blocked")
-    return new GatewayError(400, "moderation", "O pedido foi recusado pela política de conteúdo do modelo. Ajuste a descrição (evite personagens protegidos ou pessoas reais identificáveis).");
-  if (status === 402) return new GatewayError(402, "operational_balance", "O saldo operacional de IA do projeto se esgotou. O administrador precisa recarregar os créditos do projeto.");
-  if (status === 403) return new GatewayError(403, "model_denied", "Este modelo não está liberado para o projeto no momento.");
-  if (status === 429) return new GatewayError(429, "rate_limited", "Muitas solicitações ao serviço de IA. Tente novamente em instantes.", true);
-  if (status >= 500) return new GatewayError(status, "upstream", "O serviço de IA está indisponível no momento.", true);
-  return new GatewayError(status, "bad_request", raw ? `O modelo recusou a solicitação: ${raw.slice(0, 240)}` : "Solicitação inválida para o modelo.");
+    return new GatewayError(
+      400,
+      "moderation",
+      "O pedido foi recusado pela política de conteúdo do modelo. Ajuste a descrição (evite personagens protegidos ou pessoas reais identificáveis).",
+    );
+  if (status === 402)
+    return new GatewayError(
+      402,
+      "operational_balance",
+      "O saldo operacional de IA do projeto se esgotou. O administrador precisa recarregar os créditos do projeto.",
+    );
+  if (status === 403)
+    return new GatewayError(
+      403,
+      "model_denied",
+      "Este modelo não está liberado para o projeto no momento.",
+    );
+  if (status === 429)
+    return new GatewayError(
+      429,
+      "rate_limited",
+      "Muitas solicitações ao serviço de IA. Tente novamente em instantes.",
+      true,
+    );
+  if (status >= 500)
+    return new GatewayError(
+      status,
+      "upstream",
+      "O serviço de IA está indisponível no momento.",
+      true,
+    );
+  return new GatewayError(
+    status,
+    "bad_request",
+    raw
+      ? `O modelo recusou a solicitação: ${raw.slice(0, 240)}`
+      : "Solicitação inválida para o modelo.",
+  );
 }
 
-function buildRequest(model: ModelInfo, prompt: string, images: InputImage[], params: ImageParams, stream: boolean): { url: string; init: RequestInit } {
-  const headers: Record<string, string> = { Authorization: `Bearer ${apiKey()}`, "X-Lovable-AIG-SDK": "fetch" };
+function buildRequest(
+  model: ModelInfo,
+  prompt: string,
+  images: InputImage[],
+  params: ImageParams,
+  stream: boolean,
+): { url: string; init: RequestInit } {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${apiKey()}`,
+    "X-Lovable-AIG-SDK": "fetch",
+  };
   if (model.format === "openai") {
-    const size = params.aspect ? OPENAI_SIZE[params.aspect] ?? "auto" : "auto";
+    const size = params.aspect ? (OPENAI_SIZE[params.aspect] ?? "auto") : "auto";
     if (images.length === 0) {
       const body: Record<string, unknown> = { model: model.id, prompt, size };
-      if (params.quality && model.qualities.includes(params.quality)) body["quality"] = params.quality;
+      if (params.quality && model.qualities.includes(params.quality))
+        body["quality"] = params.quality;
       if (model.transparency && params.transparent) {
         body["background"] = "transparent";
         body["output_format"] = "png";
@@ -51,18 +99,30 @@ function buildRequest(model: ModelInfo, prompt: string, images: InputImage[], pa
         body["stream"] = true;
         body["partial_images"] = 1;
       }
-      return { url: `${BASE_URL}/v1/images/generations`, init: { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(body) } };
+      return {
+        url: `${BASE_URL}/v1/images/generations`,
+        init: {
+          method: "POST",
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+      };
     }
     const form = new FormData();
     form.set("model", model.id);
     form.set("prompt", prompt);
     form.set("size", size);
-    if (params.quality && model.qualities.includes(params.quality)) form.set("quality", params.quality);
+    if (params.quality && model.qualities.includes(params.quality))
+      form.set("quality", params.quality);
     if (model.transparency && params.transparent) {
       form.set("background", "transparent");
       form.set("output_format", "png");
     }
-    for (const img of images) form.append("image[]", new File([img.bytes], img.name, { type: img.mime }));
+    for (const img of images)
+      form.append(
+        "image[]",
+        new File([img.bytes as Uint8Array<ArrayBuffer>], img.name, { type: img.mime }),
+      );
     if (stream) {
       form.set("stream", "true");
       form.set("partial_images", "1");
@@ -73,7 +133,15 @@ function buildRequest(model: ModelInfo, prompt: string, images: InputImage[], pa
   if (model.format === "generate-content") {
     body = {
       model: model.id,
-      contents: [{ role: "user", parts: [{ text: prompt }, ...images.map((i) => ({ inlineData: { mimeType: i.mime, data: b64(i.bytes) } }))] }],
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: prompt },
+            ...images.map((i) => ({ inlineData: { mimeType: i.mime, data: b64(i.bytes) } })),
+          ],
+        },
+      ],
       generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
     };
   } else {
@@ -83,19 +151,39 @@ function buildRequest(model: ModelInfo, prompt: string, images: InputImage[], pa
         {
           role: "user",
           content: images.length
-            ? [{ type: "text", text: prompt }, ...images.map((i) => ({ type: "image_url", image_url: { url: `data:${i.mime};base64,${b64(i.bytes)}` } }))]
+            ? [
+                { type: "text", text: prompt },
+                ...images.map((i) => ({
+                  type: "image_url",
+                  image_url: { url: `data:${i.mime};base64,${b64(i.bytes)}` },
+                })),
+              ]
             : prompt,
         },
       ],
       modalities: ["image", "text"],
     };
-    if (params.aspect && model.aspects.includes(params.aspect)) body["image_config"] = { aspect_ratio: params.aspect };
+    if (params.aspect && model.aspects.includes(params.aspect))
+      body["image_config"] = { aspect_ratio: params.aspect };
   }
   if (stream) body["stream"] = true;
-  return { url: `${BASE_URL}/v1/images/generations`, init: { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(body) } };
+  return {
+    url: `${BASE_URL}/v1/images/generations`,
+    init: {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  };
 }
 
-async function once(model: ModelInfo, prompt: string, images: InputImage[], params: ImageParams, stream: boolean): Promise<string | null> {
+async function once(
+  model: ModelInfo,
+  prompt: string,
+  images: InputImage[],
+  params: ImageParams,
+  stream: boolean,
+): Promise<string | null> {
   const { url, init } = buildRequest(model, prompt, images, params, stream);
   const res = await fetch(url, init);
   if (!res.ok) {
@@ -132,7 +220,8 @@ async function once(model: ModelInfo, prompt: string, images: InputImage[], para
         streamErr = friendly(400, p?.error?.message ?? "", p?.error?.code);
         return;
       }
-      if (typeof type === "string" && type.endsWith(".completed") && p?.b64_json) final = p.b64_json;
+      if (typeof type === "string" && type.endsWith(".completed") && p?.b64_json)
+        final = p.b64_json;
     },
   });
   const reader = res.body!.getReader();
@@ -144,12 +233,18 @@ async function once(model: ModelInfo, prompt: string, images: InputImage[], para
   }
   if (streamErr) throw streamErr;
   if (!final && events === 0) return once(model, prompt, images, params, false);
-  if (!final) throw new GatewayError(502, "no_image", "O modelo encerrou sem entregar a imagem final.");
+  if (!final)
+    throw new GatewayError(502, "no_image", "O modelo encerrou sem entregar a imagem final.");
   return final;
 }
 
 /** Runs one image request; retries only transient failures (429/5xx) with bounded backoff. */
-export async function runImageModel(model: ModelInfo, prompt: string, images: InputImage[], params: ImageParams) {
+export async function runImageModel(
+  model: ModelInfo,
+  prompt: string,
+  images: InputImage[],
+  params: ImageParams,
+) {
   let attempt = 0;
   for (;;) {
     try {
@@ -171,8 +266,17 @@ export async function runImageModel(model: ModelInfo, prompt: string, images: In
 }
 
 export async function listGatewayImageModels(): Promise<string[]> {
-  const res = await fetch(`${BASE_URL}/v1/models`, { headers: { Authorization: `Bearer ${apiKey()}` } });
-  if (!res.ok) throw new GatewayError(res.status, "catalog", "Não foi possível consultar o catálogo de modelos.");
+  const res = await fetch(`${BASE_URL}/v1/models`, {
+    headers: { Authorization: `Bearer ${apiKey()}` },
+  });
+  if (!res.ok)
+    throw new GatewayError(
+      res.status,
+      "catalog",
+      "Não foi possível consultar o catálogo de modelos.",
+    );
   const j = (await res.json()) as any;
-  return (j?.data ?? []).filter((m: any) => m?.modalities?.output?.includes("image")).map((m: any) => m.id as string);
+  return (j?.data ?? [])
+    .filter((m: any) => m?.modalities?.output?.includes("image"))
+    .map((m: any) => m.id as string);
 }

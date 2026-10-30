@@ -11,18 +11,31 @@ async function token() {
 }
 
 export function validateImageFile(file: File) {
-  if (!UPLOAD_LIMITS.mimes.includes(file.type)) return "Formato não suportado. Use PNG, JPG ou WEBP.";
+  if (!UPLOAD_LIMITS.mimes.includes(file.type))
+    return "Formato não suportado. Use PNG, JPG ou WEBP.";
   if (file.size > UPLOAD_LIMITS.maxBytes) return "Arquivo acima de 10 MB.";
   if (file.size === 0) return "Arquivo vazio.";
   return null;
 }
 
-export async function uploadAsset(file: File | Blob, role: string, extra?: Record<string, string>, filename = "imagem.png"): Promise<UploadedAsset> {
+export async function uploadAsset(
+  file: File | Blob,
+  role: string,
+  extra?: Record<string, string>,
+  filename = "imagem.png",
+): Promise<UploadedAsset> {
   const form = new FormData();
-  form.append("file", file instanceof File ? file : new File([file], filename, { type: file.type }));
+  form.append(
+    "file",
+    file instanceof File ? file : new File([file], filename, { type: file.type }),
+  );
   form.append("role", role);
   for (const [k, v] of Object.entries(extra ?? {})) form.append(k, v);
-  const res = await fetch("/api/assets/upload", { method: "POST", headers: { Authorization: `Bearer ${await token()}` }, body: form });
+  const res = await fetch("/api/assets/upload", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token()}` },
+    body: form,
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error ?? "Falha no envio do arquivo.");
   return json as UploadedAsset;
@@ -31,7 +44,11 @@ export async function uploadAsset(file: File | Blob, role: string, extra?: Recor
 export async function uploadMedia(file: File): Promise<string> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch("/api/admin/media", { method: "POST", headers: { Authorization: `Bearer ${await token()}` }, body: form });
+  const res = await fetch("/api/admin/media", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token()}` },
+    body: form,
+  });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error ?? "Falha no envio da imagem.");
   return json.url as string;
@@ -55,12 +72,18 @@ export function errorMessage(e: unknown) {
 
 export function formatBRL(cents: number | null | undefined, currency = "brl") {
   if (cents === null || cents === undefined) return "Preço a definir";
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
 }
 
 export function formatDate(iso: string | null | undefined, withTime = true) {
   if (!iso) return "—";
-  return new Intl.DateTimeFormat("pt-BR", withTime ? { dateStyle: "short", timeStyle: "short" } : { dateStyle: "short" }).format(new Date(iso));
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    withTime ? { dateStyle: "short", timeStyle: "short" } : { dateStyle: "short" },
+  ).format(new Date(iso));
 }
 
 export function formatDuration(minutes: number) {

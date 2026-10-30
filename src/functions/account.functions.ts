@@ -27,9 +27,18 @@ export const getMe = createServerFn({ method: "GET" })
       .maybeSingle();
     const planId = sub?.plan_id ?? profile.data?.selected_plan_id ?? null;
     const { data: plan } = planId
-      ? await db.from("plans").select("id, name, credits_per_cycle, max_batch, allowed_features, allowed_models, price_cents, billing_interval, status").eq("id", planId).maybeSingle()
+      ? await db
+          .from("plans")
+          .select(
+            "id, name, credits_per_cycle, max_batch, allowed_features, allowed_models, price_cents, billing_interval, status",
+          )
+          .eq("id", planId)
+          .maybeSingle()
       : { data: null };
-    const balance = (bal.data as { available: number; reserved: number }[] | null)?.[0] ?? { available: 0, reserved: 0 };
+    const balance = (bal.data as { available: number; reserved: number }[] | null)?.[0] ?? {
+      available: 0,
+      reserved: 0,
+    };
     return {
       serverNow: new Date().toISOString(),
       profile: profile.data,
@@ -64,14 +73,21 @@ export const updateProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ name: z.string().trim().min(1).max(120) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("profiles").update({ name: data.name }).eq("id", context.userId);
+    const { error } = await context.supabase
+      .from("profiles")
+      .update({ name: data.name })
+      .eq("id", context.userId);
     if (error) throw new Error("Não foi possível salvar o perfil.");
     return { ok: true };
   });
 
 export const getPublicBranding = createServerFn({ method: "GET" }).handler(async () => {
   const U = await import("@/lib/server-utils.server");
-  const { data } = await U.supabaseAdmin.from("app_branding").select("display_name, logo_url, favicon_url").eq("id", true).single();
+  const { data } = await U.supabaseAdmin
+    .from("app_branding")
+    .select("display_name, logo_url, favicon_url")
+    .eq("id", true)
+    .single();
   return data ?? { display_name: "Vupe Studio", logo_url: null, favicon_url: null };
 });
 
@@ -80,17 +96,25 @@ export const listPublicPlans = createServerFn({ method: "GET" }).handler(async (
   const settings = await U.getSettings();
   const { data } = await U.supabaseAdmin
     .from("plans")
-    .select("id, name, description, price_cents, currency, billing_interval, credits_per_cycle, allowed_features, max_batch, highlight, sort_order, stripe_price_id_test, stripe_price_id_live")
+    .select(
+      "id, name, description, price_cents, currency, billing_interval, credits_per_cycle, allowed_features, max_batch, highlight, sort_order, stripe_price_id_test, stripe_price_id_live",
+    )
     .eq("status", "active")
     .order("sort_order");
   return (data ?? []).map(({ stripe_price_id_test, stripe_price_id_live, ...p }) => ({
     ...p,
-    checkout_available: !!(settings.stripe_mode === "test" ? stripe_price_id_test : stripe_price_id_live),
+    checkout_available: !!(settings.stripe_mode === "test"
+      ? stripe_price_id_test
+      : stripe_price_id_live),
   }));
 });
 
 export const getSignupTrialInfo = createServerFn({ method: "GET" }).handler(async () => {
   const U = await import("@/lib/server-utils.server");
   const s = await U.getSettings();
-  return { enabled: s.trial_enabled && s.trial_duration_minutes > 0, minutes: s.trial_duration_minutes, credits: s.trial_credits };
+  return {
+    enabled: s.trial_enabled && s.trial_duration_minutes > 0,
+    minutes: s.trial_duration_minutes,
+    credits: s.trial_credits,
+  };
 });

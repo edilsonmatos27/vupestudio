@@ -6,13 +6,22 @@ export type Admin = typeof supabaseAdmin;
 export { supabaseAdmin };
 
 export class AppError extends Error {
-  constructor(public code: string, message: string, public status = 400) {
+  constructor(
+    public code: string,
+    message: string,
+    public status = 400,
+  ) {
     super(message);
   }
 }
 
 export async function isAdmin(userId: string) {
-  const { data } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
   return !!data;
 }
 
@@ -63,7 +72,11 @@ export async function getAccess(userId: string): Promise<Access> {
 }
 
 export async function getSettings() {
-  const { data, error } = await supabaseAdmin.from("app_settings").select("*").eq("id", true).single();
+  const { data, error } = await supabaseAdmin
+    .from("app_settings")
+    .select("*")
+    .eq("id", true)
+    .single();
   if (error || !data) throw new AppError("db", "Configurações indisponíveis.", 500);
   return data;
 }
@@ -72,7 +85,8 @@ export async function getSettings() {
 export async function userFromRequest(request: Request) {
   const auth = request.headers.get("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!token || token.split(".").length !== 3) throw new AppError("unauthorized", "Sessão inválida.", 401);
+  if (!token || token.split(".").length !== 3)
+    throw new AppError("unauthorized", "Sessão inválida.", 401);
   const url = process.env["SUPABASE_URL"]!;
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const client = createClient<Database>(url, key, {
@@ -92,19 +106,38 @@ export async function userFromRequest(request: Request) {
 }
 
 export function jsonError(e: unknown) {
-  if (e instanceof AppError) return Response.json({ error: e.message, code: e.code }, { status: e.status });
+  if (e instanceof AppError)
+    return Response.json({ error: e.message, code: e.code }, { status: e.status });
   console.error(e);
-  return Response.json({ error: "Erro interno. Tente novamente.", code: "internal" }, { status: 500 });
+  return Response.json(
+    { error: "Erro interno. Tente novamente.", code: "internal" },
+    { status: 500 },
+  );
 }
 
 export function detectImageMime(bytes: Uint8Array): string | null {
-  if (bytes.length > 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png";
-  if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+  if (
+    bytes.length > 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47
+  )
+    return "image/png";
+  if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)
+    return "image/jpeg";
   if (
     bytes.length > 12 &&
-    bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
-    bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
-  ) return "image/webp";
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  )
+    return "image/webp";
   return null;
 }
 
@@ -124,15 +157,28 @@ export async function signedUrl(path: string, download?: string, ttl = 3600) {
 
 /** Remove storage files of soft-deleted assets; safe to call repeatedly. */
 export async function purgeDeletedAssets(userId?: string) {
-  let q = supabaseAdmin.from("assets").select("id, storage_path").not("deleted_at", "is", null).is("purged_at", null).limit(200);
+  let q = supabaseAdmin
+    .from("assets")
+    .select("id, storage_path")
+    .not("deleted_at", "is", null)
+    .is("purged_at", null)
+    .limit(200);
   if (userId) q = q.eq("user_id", userId);
   const { data } = await q;
   if (!data?.length) return 0;
-  const { error } = await supabaseAdmin.storage.from("vupe-assets").remove(data.map((a) => a.storage_path));
+  const { error } = await supabaseAdmin.storage
+    .from("vupe-assets")
+    .remove(data.map((a) => a.storage_path));
   if (error) {
     console.error("purge failed", error.message);
     return 0;
   }
-  await supabaseAdmin.from("assets").update({ purged_at: new Date().toISOString() }).in("id", data.map((a) => a.id));
+  await supabaseAdmin
+    .from("assets")
+    .update({ purged_at: new Date().toISOString() })
+    .in(
+      "id",
+      data.map((a) => a.id),
+    );
   return data.length;
 }

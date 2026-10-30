@@ -42,31 +42,60 @@ function Reset() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password.length < 8) return setError("A senha precisa de ao menos 8 caracteres.");
-    if (password !== confirm) return setError("As senhas não coincidem.");
+    if (password.length < 8) {
+      setError("A senha precisa de ao menos 8 caracteres.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("As senhas não coincidem.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) return setError("Não foi possível alterar a senha. Solicite um novo link.");
+    if (error) {
+      setError("Não foi possível alterar a senha. Solicite um novo link.");
+      return;
+    }
     navigate({ to: "/painel" });
   };
 
   return (
     <AuthLayout title="Definir nova senha">
       {!ready ? (
-        <p className="text-sm text-muted-foreground">Validando o link de recuperação… Se nada acontecer, solicite um novo link.</p>
+        <p className="text-sm text-muted-foreground">
+          Validando o link de recuperação… Se nada acontecer, solicite um novo link.
+        </p>
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="p1">Nova senha</Label>
-            <Input id="p1" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              id="p1"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="p2">Confirmar senha</Label>
-            <Input id="p2" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Input
+              id="p2"
+              type="password"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
           </div>
-          {error && <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
-          <Button type="submit" variant="hero" className="w-full" disabled={loading}>{loading && <Loader2 className="animate-spin" />} Salvar nova senha</Button>
+          {error && (
+            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </p>
+          )}
+          <Button type="submit" variant="hero" className="w-full" disabled={loading}>
+            {loading && <Loader2 className="animate-spin" />} Salvar nova senha
+          </Button>
         </form>
       )}
     </AuthLayout>

@@ -10,8 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAgentesRouteImport } from './routes/_authenticated/agentes'
+import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
+import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
+import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
+import { Route as AuthenticatedInventarRouteImport } from './routes/_authenticated/inventar'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
+import { Route as AuthenticatedVetorizarRouteImport } from './routes/_authenticated/vetorizar'
+import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin/assinaturas'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes'
+import { Route as AuthenticatedAdminPagamentosRouteImport } from './routes/_authenticated/admin/pagamentos'
+import { Route as AuthenticatedAdminPlanosRouteImport } from './routes/_authenticated/admin/planos'
+import { Route as AuthenticatedProjetosIndexRouteImport } from './routes/_authenticated/projetos.index'
+import { Route as AuthenticatedProjetosIdRouteImport } from './routes/_authenticated/projetos.$id'
 import { Route as ApiAdminMediaRouteImport } from './routes/api/admin/media'
 import { Route as ApiAssetsUploadRouteImport } from './routes/api/assets/upload'
+import { Route as AuthenticatedAdminAssinantesIndexRouteImport } from './routes/_authenticated/admin/assinantes.index'
+import { Route as AuthenticatedAdminAssinantesIdRouteImport } from './routes/_authenticated/admin/assinantes.$id'
 import { Route as ApiPublicMediaNameRouteImport } from './routes/api/public/media.$name'
 import { Route as ApiPublicStripeWebhookModeRouteImport } from './routes/api/public/stripe.webhook.$mode'
 
@@ -19,6 +43,120 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAgentesRoute = AuthenticatedAgentesRouteImport.update({
+  id: '/agentes',
+  path: '/agentes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCreditosRoute = AuthenticatedCreditosRouteImport.update({
+  id: '/creditos',
+  path: '/creditos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCriarRoute = AuthenticatedCriarRouteImport.update({
+  id: '/criar',
+  path: '/criar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInventarRoute = AuthenticatedInventarRouteImport.update({
+  id: '/inventar',
+  path: '/inventar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVetorizarRoute = AuthenticatedVetorizarRouteImport.update({
+  id: '/vetorizar',
+  path: '/vetorizar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminAssinaturasRoute =
+  AuthenticatedAdminAssinaturasRouteImport.update({
+    id: '/assinaturas',
+    path: '/assinaturas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPagamentosRoute =
+  AuthenticatedAdminPagamentosRouteImport.update({
+    id: '/pagamentos',
+    path: '/pagamentos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPlanosRoute =
+  AuthenticatedAdminPlanosRouteImport.update({
+    id: '/planos',
+    path: '/planos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedProjetosIndexRoute =
+  AuthenticatedProjetosIndexRouteImport.update({
+    id: '/projetos/',
+    path: '/projetos/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProjetosIdRoute = AuthenticatedProjetosIdRouteImport.update({
+  id: '/projetos/$id',
+  path: '/projetos/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiAdminMediaRoute = ApiAdminMediaRouteImport.update({
   id: '/api/admin/media',
@@ -30,6 +168,18 @@ const ApiAssetsUploadRoute = ApiAssetsUploadRouteImport.update({
   path: '/api/assets/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminAssinantesIndexRoute =
+  AuthenticatedAdminAssinantesIndexRouteImport.update({
+    id: '/assinantes/',
+    path: '/assinantes/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAssinantesIdRoute =
+  AuthenticatedAdminAssinantesIdRouteImport.update({
+    id: '/assinantes/$id',
+    path: '/assinantes/$id',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const ApiPublicMediaNameRoute = ApiPublicMediaNameRouteImport.update({
   id: '/api/public/media/$name',
   path: '/api/public/media/$name',
@@ -44,52 +194,198 @@ const ApiPublicStripeWebhookModeRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cadastro': typeof CadastroRoute
+  '/entrar': typeof EntrarRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/agentes': typeof AuthenticatedAgentesRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
+  '/criar': typeof AuthenticatedCriarRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/inventar': typeof AuthenticatedInventarRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/planos': typeof AuthenticatedPlanosRoute
+  '/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin/planos': typeof AuthenticatedAdminPlanosRoute
+  '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/projetos/': typeof AuthenticatedProjetosIndexRoute
+  '/admin/assinantes/$id': typeof AuthenticatedAdminAssinantesIdRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
+  '/admin/assinantes/': typeof AuthenticatedAdminAssinantesIndexRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cadastro': typeof CadastroRoute
+  '/entrar': typeof EntrarRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/agentes': typeof AuthenticatedAgentesRoute
+  '/creditos': typeof AuthenticatedCreditosRoute
+  '/criar': typeof AuthenticatedCriarRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/inventar': typeof AuthenticatedInventarRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/planos': typeof AuthenticatedPlanosRoute
+  '/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin/planos': typeof AuthenticatedAdminPlanosRoute
+  '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/projetos': typeof AuthenticatedProjetosIndexRoute
+  '/admin/assinantes/$id': typeof AuthenticatedAdminAssinantesIdRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
+  '/admin/assinantes': typeof AuthenticatedAdminAssinantesIndexRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/cadastro': typeof CadastroRoute
+  '/entrar': typeof EntrarRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/agentes': typeof AuthenticatedAgentesRoute
+  '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
+  '/_authenticated/criar': typeof AuthenticatedCriarRoute
+  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
+  '/_authenticated/inventar': typeof AuthenticatedInventarRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/planos': typeof AuthenticatedPlanosRoute
+  '/_authenticated/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/_authenticated/admin/planos': typeof AuthenticatedAdminPlanosRoute
+  '/_authenticated/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/_authenticated/projetos/': typeof AuthenticatedProjetosIndexRoute
+  '/_authenticated/admin/assinantes/$id': typeof AuthenticatedAdminAssinantesIdRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
+  '/_authenticated/admin/assinantes/': typeof AuthenticatedAdminAssinantesIndexRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cadastro'
+    | '/entrar'
+    | '/privacidade'
+    | '/recuperar-senha'
+    | '/reset-password'
+    | '/admin'
+    | '/agentes'
+    | '/creditos'
+    | '/criar'
+    | '/historico'
+    | '/inventar'
+    | '/painel'
+    | '/perfil'
+    | '/planos'
+    | '/vetorizar'
+    | '/admin/assinaturas'
+    | '/admin/configuracoes'
+    | '/admin/pagamentos'
+    | '/admin/planos'
+    | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/projetos/'
+    | '/admin/assinantes/$id'
     | '/api/public/media/$name'
+    | '/admin/assinantes/'
     | '/api/public/stripe/webhook/$mode'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cadastro'
+    | '/entrar'
+    | '/privacidade'
+    | '/recuperar-senha'
+    | '/reset-password'
+    | '/admin'
+    | '/agentes'
+    | '/creditos'
+    | '/criar'
+    | '/historico'
+    | '/inventar'
+    | '/painel'
+    | '/perfil'
+    | '/planos'
+    | '/vetorizar'
+    | '/admin/assinaturas'
+    | '/admin/configuracoes'
+    | '/admin/pagamentos'
+    | '/admin/planos'
+    | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/projetos'
+    | '/admin/assinantes/$id'
     | '/api/public/media/$name'
+    | '/admin/assinantes'
     | '/api/public/stripe/webhook/$mode'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/cadastro'
+    | '/entrar'
+    | '/privacidade'
+    | '/recuperar-senha'
+    | '/reset-password'
+    | '/_authenticated/admin'
+    | '/_authenticated/agentes'
+    | '/_authenticated/creditos'
+    | '/_authenticated/criar'
+    | '/_authenticated/historico'
+    | '/_authenticated/inventar'
+    | '/_authenticated/painel'
+    | '/_authenticated/perfil'
+    | '/_authenticated/planos'
+    | '/_authenticated/vetorizar'
+    | '/_authenticated/admin/assinaturas'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/pagamentos'
+    | '/_authenticated/admin/planos'
+    | '/_authenticated/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/_authenticated/projetos/'
+    | '/_authenticated/admin/assinantes/$id'
     | '/api/public/media/$name'
+    | '/_authenticated/admin/assinantes/'
     | '/api/public/stripe/webhook/$mode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  CadastroRoute: typeof CadastroRoute
+  EntrarRoute: typeof EntrarRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiAdminMediaRoute: typeof ApiAdminMediaRoute
   ApiAssetsUploadRoute: typeof ApiAssetsUploadRoute
   ApiPublicMediaNameRoute: typeof ApiPublicMediaNameRoute
@@ -105,6 +401,160 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-senha': {
+      id: '/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/recuperar-senha'
+      preLoaderRoute: typeof RecuperarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/agentes': {
+      id: '/_authenticated/agentes'
+      path: '/agentes'
+      fullPath: '/agentes'
+      preLoaderRoute: typeof AuthenticatedAgentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creditos': {
+      id: '/_authenticated/creditos'
+      path: '/creditos'
+      fullPath: '/creditos'
+      preLoaderRoute: typeof AuthenticatedCreditosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/criar': {
+      id: '/_authenticated/criar'
+      path: '/criar'
+      fullPath: '/criar'
+      preLoaderRoute: typeof AuthenticatedCriarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historico': {
+      id: '/_authenticated/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventar': {
+      id: '/_authenticated/inventar'
+      path: '/inventar'
+      fullPath: '/inventar'
+      preLoaderRoute: typeof AuthenticatedInventarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/planos': {
+      id: '/_authenticated/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof AuthenticatedPlanosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vetorizar': {
+      id: '/_authenticated/vetorizar'
+      path: '/vetorizar'
+      fullPath: '/vetorizar'
+      preLoaderRoute: typeof AuthenticatedVetorizarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/assinaturas': {
+      id: '/_authenticated/admin/assinaturas'
+      path: '/assinaturas'
+      fullPath: '/admin/assinaturas'
+      preLoaderRoute: typeof AuthenticatedAdminAssinaturasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/pagamentos': {
+      id: '/_authenticated/admin/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/admin/pagamentos'
+      preLoaderRoute: typeof AuthenticatedAdminPagamentosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/planos': {
+      id: '/_authenticated/admin/planos'
+      path: '/planos'
+      fullPath: '/admin/planos'
+      preLoaderRoute: typeof AuthenticatedAdminPlanosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/projetos/': {
+      id: '/_authenticated/projetos/'
+      path: '/projetos'
+      fullPath: '/projetos/'
+      preLoaderRoute: typeof AuthenticatedProjetosIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projetos/$id': {
+      id: '/_authenticated/projetos/$id'
+      path: '/projetos/$id'
+      fullPath: '/projetos/$id'
+      preLoaderRoute: typeof AuthenticatedProjetosIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/admin/media': {
       id: '/api/admin/media'
       path: '/api/admin/media'
@@ -118,6 +568,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/assets/upload'
       preLoaderRoute: typeof ApiAssetsUploadRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/assinantes/': {
+      id: '/_authenticated/admin/assinantes/'
+      path: '/assinantes'
+      fullPath: '/admin/assinantes/'
+      preLoaderRoute: typeof AuthenticatedAdminAssinantesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/assinantes/$id': {
+      id: '/_authenticated/admin/assinantes/$id'
+      path: '/assinantes/$id'
+      fullPath: '/admin/assinantes/$id'
+      preLoaderRoute: typeof AuthenticatedAdminAssinantesIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/media/$name': {
       id: '/api/public/media/$name'
@@ -136,8 +600,72 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminPagamentosRoute: typeof AuthenticatedAdminPagamentosRoute
+  AuthenticatedAdminPlanosRoute: typeof AuthenticatedAdminPlanosRoute
+  AuthenticatedAdminAssinantesIdRoute: typeof AuthenticatedAdminAssinantesIdRoute
+  AuthenticatedAdminAssinantesIndexRoute: typeof AuthenticatedAdminAssinantesIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
+    AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+    AuthenticatedAdminPagamentosRoute: AuthenticatedAdminPagamentosRoute,
+    AuthenticatedAdminPlanosRoute: AuthenticatedAdminPlanosRoute,
+    AuthenticatedAdminAssinantesIdRoute: AuthenticatedAdminAssinantesIdRoute,
+    AuthenticatedAdminAssinantesIndexRoute:
+      AuthenticatedAdminAssinantesIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedAgentesRoute: typeof AuthenticatedAgentesRoute
+  AuthenticatedCreditosRoute: typeof AuthenticatedCreditosRoute
+  AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
+  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
+  AuthenticatedInventarRoute: typeof AuthenticatedInventarRoute
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
+  AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
+  AuthenticatedProjetosIdRoute: typeof AuthenticatedProjetosIdRoute
+  AuthenticatedProjetosIndexRoute: typeof AuthenticatedProjetosIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedAgentesRoute: AuthenticatedAgentesRoute,
+  AuthenticatedCreditosRoute: AuthenticatedCreditosRoute,
+  AuthenticatedCriarRoute: AuthenticatedCriarRoute,
+  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
+  AuthenticatedInventarRoute: AuthenticatedInventarRoute,
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
+  AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
+  AuthenticatedProjetosIdRoute: AuthenticatedProjetosIdRoute,
+  AuthenticatedProjetosIndexRoute: AuthenticatedProjetosIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  CadastroRoute: CadastroRoute,
+  EntrarRoute: EntrarRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  RecuperarSenhaRoute: RecuperarSenhaRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiAdminMediaRoute: ApiAdminMediaRoute,
   ApiAssetsUploadRoute: ApiAssetsUploadRoute,
   ApiPublicMediaNameRoute: ApiPublicMediaNameRoute,

@@ -26,7 +26,10 @@ export function useCountdown(target: string | null | undefined, serverNow?: stri
 
 export function AccessBanner() {
   const { data: me, refetch } = useMe();
-  const cd = useCountdown(me?.access.code === "trial" ? me.access.trial_ends_at : null, me?.serverNow);
+  const cd = useCountdown(
+    me?.access.code === "trial" ? me.access.trial_ends_at : null,
+    me?.serverNow,
+  );
   useEffect(() => {
     if (cd?.expired) refetch();
   }, [cd?.expired, refetch]);
@@ -38,10 +41,13 @@ export function AccessBanner() {
         <div className="flex items-center gap-2 text-accent-foreground">
           <Clock className="size-4" />
           <span>
-            Período de teste do plano <b>{me.plan?.name ?? "—"}</b> · termina em {formatDate(me.access.trial_ends_at)} · restam <b>{cd.label}</b>
+            Período de teste do plano <b>{me.plan?.name ?? "—"}</b> · termina em{" "}
+            {formatDate(me.access.trial_ends_at)} · restam <b>{cd.label}</b>
           </span>
         </div>
-        <Button asChild size="sm" variant="outline"><Link to="/planos">Assinar agora</Link></Button>
+        <Button asChild size="sm" variant="outline">
+          <Link to="/planos">Assinar agora</Link>
+        </Button>
       </div>
     );
   }
@@ -51,15 +57,26 @@ export function AccessBanner() {
         <div className="flex items-start gap-3">
           <Lock className="mt-0.5 size-5 text-destructive" />
           <div className="text-sm">
-            <p className="font-semibold">{code === "trial_expired" ? TRIAL_EXPIRED_MESSAGE : "Você não possui teste válido nem assinatura paga vigente."}</p>
+            <p className="font-semibold">
+              {code === "trial_expired"
+                ? TRIAL_EXPIRED_MESSAGE
+                : "Você não possui teste válido nem assinatura paga vigente."}
+            </p>
             <p className="mt-1 text-muted-foreground">
               Plano escolhido: <b>{me.plan?.name ?? "—"}</b>
-              {me.trial?.granted && <> · teste de {formatDate(me.trial.started_at)} a {formatDate(me.trial.ends_at)}</>}
-              {" "}· Seus arquivos continuam disponíveis para visualizar e baixar.
+              {me.trial?.granted && (
+                <>
+                  {" "}
+                  · teste de {formatDate(me.trial.started_at)} a {formatDate(me.trial.ends_at)}
+                </>
+              )}{" "}
+              · Seus arquivos continuam disponíveis para visualizar e baixar.
             </p>
           </div>
         </div>
-        <Button asChild variant="hero" size="sm"><Link to="/planos">Assinar</Link></Button>
+        <Button asChild variant="hero" size="sm">
+          <Link to="/planos">Assinar</Link>
+        </Button>
       </div>
     );
   }
@@ -73,7 +90,11 @@ export function AccessBanner() {
   if (me.subscription?.access_state === "payment_failed") {
     return (
       <div className="mb-6 rounded-2xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
-        O último pagamento falhou. Você mantém acesso até {formatDate(me.subscription.paid_through)}. <Link to="/planos" className="font-semibold underline">Atualizar pagamento</Link>
+        O último pagamento falhou. Você mantém acesso até {formatDate(me.subscription.paid_through)}
+        .{" "}
+        <Link to="/planos" className="font-semibold underline">
+          Atualizar pagamento
+        </Link>
       </div>
     );
   }
