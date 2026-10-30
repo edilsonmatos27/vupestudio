@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDownload } from "@/components/lightbox";
-import { assetDownloadUrl, failVector, saveVector, startVectorize, studioOptions } from "@/server/studio.functions";
+import { assetDownloadUrl, failVector, saveVector, startVectorize, studioOptions } from "@/functions/studio.functions";
 import { errorMessage, newKey, type UploadedAsset } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/vetorizar")({

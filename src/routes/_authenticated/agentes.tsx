@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { adminDeleteAgent, adminGetAgentPrompt, adminListAgents, adminSaveAgent, adminSetAgentStatus, listMyAgents } from "@/server/agents.functions";
-import { adminListPlans } from "@/server/plans.functions";
+import { adminDeleteAgent, adminGetAgentPrompt, adminListAgents, adminSaveAgent, adminSetAgentStatus, listMyAgents } from "@/functions/agents.functions";
+import { adminListPlans } from "@/functions/plans.functions";
 import { useMe } from "@/hooks/use-me";
 import { errorMessage, formatDate, uploadMedia, validateImageFile } from "@/lib/client-api";
 

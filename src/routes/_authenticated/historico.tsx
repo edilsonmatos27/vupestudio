@@ -5,7 +5,7 @@ import { History } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState, PageHeader } from "@/components/states";
 import { OperationCard, type Op } from "@/components/operation-card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { listHistory, studioOptions } from "@/server/studio.functions";
+import { listHistory, studioOptions } from "@/functions/studio.functions";
 import { errorMessage } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/historico")({

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Users } from "lucide-react";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/states";
 import { Input } from "@/components/ui/input";
-import { adminListSubscribers } from "@/server/admin.functions";
+import { adminListSubscribers } from "@/functions/admin.functions";
 import { errorMessage, formatDate } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/admin/assinantes/")({

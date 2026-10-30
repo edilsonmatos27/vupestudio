@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { assetDownloadUrl } from "@/server/studio.functions";
+import { assetDownloadUrl } from "@/functions/studio.functions";
 import { errorMessage, triggerDownload } from "@/lib/client-api";
 
 export function useDownload() {

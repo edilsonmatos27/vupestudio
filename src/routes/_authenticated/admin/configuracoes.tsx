@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import {
   adminCheckCatalog, adminGetSettings, adminGetStripe, adminListAudit, adminRecentEvents, adminReconcile, adminRemoveStripeField,
   adminSaveAi, adminSaveBranding, adminSaveStripe, adminSaveTrial, adminSetStripeMode, adminTestStripe,
-} from "@/server/admin.functions";
+} from "@/functions/admin.functions";
 import { errorMessage, formatDate, formatDuration, uploadMedia, validateImageFile } from "@/lib/client-api";
 import { FEATURES, MODEL_CATALOG } from "@/lib/models";
 

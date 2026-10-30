@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPublicBranding } from "@/server/account.functions";
+import { getPublicBranding } from "@/functions/account.functions";
 
 export function useBranding() {
   return useQuery({ queryKey: ["branding"], queryFn: () => getPublicBranding(), staleTime: 60_000 });

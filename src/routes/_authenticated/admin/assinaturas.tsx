@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/states";
-import { adminListSubscriptions } from "@/server/admin.functions";
+import { adminListSubscriptions } from "@/functions/admin.functions";
 import { errorMessage, formatDate } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/admin/assinaturas")({

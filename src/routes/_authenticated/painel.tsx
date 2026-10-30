@@ -4,8 +4,8 @@ import { Coins, FolderOpen, PenTool, Sparkles, Wand2, Image as ImageIcon } from 
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from "@/components/states";
 import { Lightbox } from "@/components/lightbox";
-import { dashboardData } from "@/server/studio.functions";
-import { adminOverview } from "@/server/admin.functions";
+import { dashboardData } from "@/functions/studio.functions";
+import { adminOverview } from "@/functions/admin.functions";
 import { useMe } from "@/hooks/use-me";
 import { useCountdown } from "@/components/access-banner";
 import { errorMessage, formatBRL, formatDate } from "@/lib/client-api";

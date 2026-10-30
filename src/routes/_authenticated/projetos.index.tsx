@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { createProject, listProjects } from "@/server/projects.functions";
+import { createProject, listProjects } from "@/functions/projects.functions";
 import { errorMessage, formatDate } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/projetos/")({

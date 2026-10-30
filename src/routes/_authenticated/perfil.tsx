@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { updateProfile } from "@/server/account.functions";
+import { updateProfile } from "@/functions/account.functions";
 import { useMe } from "@/hooks/use-me";
 import { errorMessage, formatDate } from "@/lib/client-api";
 

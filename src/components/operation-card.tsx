@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { deleteAsset, moveAssetToProject } from "@/server/studio.functions";
+import { deleteAsset, moveAssetToProject } from "@/functions/studio.functions";
 import { errorMessage, formatDate } from "@/lib/client-api";
 import { TASK_LABEL, findModel } from "@/lib/models";
 import { LogoOverlayDialog } from "@/components/logo-overlay";

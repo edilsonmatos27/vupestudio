@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Lightbox } from "@/components/lightbox";
-import { deleteProject, getProject, updateProject } from "@/server/projects.functions";
+import { deleteProject, getProject, updateProject } from "@/functions/projects.functions";
 import { errorMessage, formatDate } from "@/lib/client-api";
 import { TASK_LABEL } from "@/lib/models";
 

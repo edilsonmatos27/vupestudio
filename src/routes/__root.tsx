@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getPublicBranding } from "@/server/account.functions";
+import { getPublicBranding } from "@/functions/account.functions";
 
 function NotFoundComponent() {
   return (

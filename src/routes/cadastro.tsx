@@ -8,7 +8,7 @@ import { AuthLayout } from "@/components/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSignupTrialInfo, listPublicPlans } from "@/server/account.functions";
+import { getSignupTrialInfo, listPublicPlans } from "@/functions/account.functions";
 import { ErrorState, LoadingState, EmptyState } from "@/components/states";
 import { formatBRL, formatDuration } from "@/lib/client-api";
 

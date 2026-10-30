@@ -7,7 +7,7 @@ import { ErrorState, LoadingState, StatusBadge } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { adminSetBlocked, adminSubscriberDetail } from "@/server/admin.functions";
+import { adminSetBlocked, adminSubscriberDetail } from "@/functions/admin.functions";
 import { errorMessage, formatBRL, formatDate } from "@/lib/client-api";
 
 export const Route = createFileRoute("/_authenticated/admin/assinantes/$id")({

@@ -4,7 +4,7 @@ import { Bot, Layers, PenTool, Sparkles, Wand2 } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { BrandMark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
-import { listPublicPlans } from "@/server/account.functions";
+import { listPublicPlans } from "@/functions/account.functions";
 import { formatBRL } from "@/lib/client-api";
 import { FEATURES } from "@/lib/models";
 
