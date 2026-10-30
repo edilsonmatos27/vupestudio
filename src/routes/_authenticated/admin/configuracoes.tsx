@@ -508,7 +508,8 @@ function Stripe() {
     setBusy("test");
     try {
       const r = await adminTestStripe({ data: { mode } });
-      r.ok ? toast.success("Autenticação da API validada.") : toast.error(`Falha: ${r.error}`);
+      if (r.ok) toast.success("Autenticação da API validada.");
+      else toast.error(`Falha: ${r.error}`);
       refresh();
     } catch (e) {
       toast.error(errorMessage(e));

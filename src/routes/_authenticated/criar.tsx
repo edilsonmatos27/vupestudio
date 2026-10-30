@@ -17,16 +17,18 @@ export const Route = createFileRoute("/_authenticated/criar")({
       { name: "description", content: "Edite, componha e gere variações de imagens." },
     ],
   }),
-  component: () => {
-    const { agente, source, modo } = Route.useSearch();
-    return (
-      <Workbench
-        key={`${source ?? ""}-${modo ?? ""}`}
-        mode="create"
-        agentId={agente}
-        sourceAssetId={source}
-        initialTask={modo}
-      />
-    );
-  },
+  component: CreatePage,
 });
+
+function CreatePage() {
+  const { agente, source, modo } = Route.useSearch();
+  return (
+    <Workbench
+      key={`${source ?? ""}-${modo ?? ""}`}
+      mode="create"
+      agentId={agente}
+      sourceAssetId={source}
+      initialTask={modo}
+    />
+  );
+}

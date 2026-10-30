@@ -10,8 +10,10 @@ export const Route = createFileRoute("/_authenticated/inventar")({
       { name: "description", content: "Gere imagens do zero com IA." },
     ],
   }),
-  component: () => {
-    const { agente } = Route.useSearch();
-    return <Workbench mode="invent" agentId={agente} />;
-  },
+  component: InventPage,
 });
+
+function InventPage() {
+  const { agente } = Route.useSearch();
+  return <Workbench mode="invent" agentId={agente} />;
+}
