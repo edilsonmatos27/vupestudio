@@ -59,7 +59,9 @@ function Signup() {
       setError(
         m.includes("PLAN_INVALID") || m.toLowerCase().includes("database error")
           ? "O plano escolhido não está mais disponível. Recarregue e escolha outro."
-          : m.toLowerCase().includes("already")
+          : m.toLowerCase().includes("email address")
+            ? "Este endereço de e-mail não é aceito. Use um e-mail real que possa receber a confirmação."
+            : m.toLowerCase().includes("already")
             ? "Este e-mail já está cadastrado. Entre ou recupere sua senha."
             : m.toLowerCase().includes("password")
               ? "Senha fraca ou comprometida. Escolha outra senha."
