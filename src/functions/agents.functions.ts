@@ -90,15 +90,13 @@ export const adminSaveAgent = createServerFn({ method: "POST" })
         .select(PUBLIC_COLS)
         .single();
       if (error || !a) throw new Error("Falha ao criar o agente.");
-      await db
-        .from("agent_versions")
-        .insert({
-          agent_id: a.id,
-          version: 1,
-          name: a.name,
-          base_prompt,
-          created_by: context.userId,
-        });
+      await db.from("agent_versions").insert({
+        agent_id: a.id,
+        version: 1,
+        name: a.name,
+        base_prompt,
+        created_by: context.userId,
+      });
       await U.audit({
         actor_id: context.userId,
         action: "agent_created",
@@ -122,15 +120,13 @@ export const adminSaveAgent = createServerFn({ method: "POST" })
     let version = prev.current_version;
     if (pv?.base_prompt !== base_prompt || prev.name !== fields.name) {
       version += 1;
-      await db
-        .from("agent_versions")
-        .insert({
-          agent_id: id,
-          version,
-          name: fields.name,
-          base_prompt,
-          created_by: context.userId,
-        });
+      await db.from("agent_versions").insert({
+        agent_id: id,
+        version,
+        name: fields.name,
+        base_prompt,
+        created_by: context.userId,
+      });
     }
     const { data: a, error } = await db
       .from("agents")

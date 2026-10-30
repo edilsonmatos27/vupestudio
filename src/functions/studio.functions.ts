@@ -250,16 +250,14 @@ export const createOperation = createServerFn({ method: "POST" })
       if (again) return { operationId: again.id, duplicate: true };
       throw new Error("Não foi possível registrar a operação.");
     }
-    await db
-      .from("operation_items")
-      .insert(
-        items.map((it, idx) => ({
-          operation_id: op.id,
-          user_id: uid,
-          idx,
-          source_asset_id: it.source_asset_id,
-        })),
-      );
+    await db.from("operation_items").insert(
+      items.map((it, idx) => ({
+        operation_id: op.id,
+        user_id: uid,
+        idx,
+        source_asset_id: it.source_asset_id,
+      })),
+    );
     if (!admin) {
       const { error: rErr } = await db.rpc("reserve_operation_credits", { _op: op.id });
       if (rErr) {
@@ -740,16 +738,14 @@ export const startVectorize = createServerFn({ method: "POST" })
         .single();
       if (error || !op) throw new Error("Não foi possível iniciar a vetorização.");
       opId = op.id;
-      await db
-        .from("operation_items")
-        .insert({
-          operation_id: op.id,
-          user_id: context.userId,
-          idx: 0,
-          status: "running",
-          source_asset_id: src.id,
-          started_at: new Date().toISOString(),
-        });
+      await db.from("operation_items").insert({
+        operation_id: op.id,
+        user_id: context.userId,
+        idx: 0,
+        status: "running",
+        source_asset_id: src.id,
+        started_at: new Date().toISOString(),
+      });
     }
     const { data: item } = await db
       .from("operation_items")
@@ -833,21 +829,19 @@ export const saveVector = createServerFn({ method: "POST" })
           .is("deleted_at", null)
           .maybeSingle()
       : { data: null };
-    await db
-      .from("assets")
-      .insert({
-        id: assetId,
-        user_id: context.userId,
-        project_id: proj?.id ?? null,
-        operation_id: op.id,
-        operation_item_id: item.id,
-        parent_asset_id: item.source_asset_id,
-        kind: "vector",
-        storage_path: path,
-        mime: "image/svg+xml",
-        size_bytes: bytes.length,
-        filename: `vupe-vetor-${assetId.slice(0, 8)}.svg`,
-      });
+    await db.from("assets").insert({
+      id: assetId,
+      user_id: context.userId,
+      project_id: proj?.id ?? null,
+      operation_id: op.id,
+      operation_item_id: item.id,
+      parent_asset_id: item.source_asset_id,
+      kind: "vector",
+      storage_path: path,
+      mime: "image/svg+xml",
+      size_bytes: bytes.length,
+      filename: `vupe-vetor-${assetId.slice(0, 8)}.svg`,
+    });
     await db
       .from("operation_items")
       .update({ status: "succeeded", asset_id: assetId, finished_at: new Date().toISOString() })
