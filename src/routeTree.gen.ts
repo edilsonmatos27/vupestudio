@@ -27,6 +27,7 @@ import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedVetorizarRouteImport } from './routes/_authenticated/vetorizar'
 import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin/assinaturas'
 import { Route as AuthenticatedAdminPagamentosRouteImport } from './routes/_authenticated/admin/pagamentos'
+import { Route as AuthenticatedAdminPlanosRouteImport } from './routes/_authenticated/admin/planos'
 import { Route as AuthenticatedProjetosIndexRouteImport } from './routes/_authenticated/projetos.index'
 import { Route as AuthenticatedProjetosIdRouteImport } from './routes/_authenticated/projetos.$id'
 import { Route as ApiAdminMediaRouteImport } from './routes/api/admin/media'
@@ -127,6 +128,12 @@ const AuthenticatedAdminPagamentosRoute =
     path: '/admin/pagamentos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPlanosRoute =
+  AuthenticatedAdminPlanosRouteImport.update({
+    id: '/admin/planos',
+    path: '/admin/planos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjetosIndexRoute =
   AuthenticatedProjetosIndexRouteImport.update({
     id: '/projetos/',
@@ -190,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin/planos': typeof AuthenticatedAdminPlanosRoute
   '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
@@ -217,6 +225,7 @@ export interface FileRoutesByTo {
   '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/admin/planos': typeof AuthenticatedAdminPlanosRoute
   '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
@@ -246,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/vetorizar': typeof AuthenticatedVetorizarRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
+  '/_authenticated/admin/planos': typeof AuthenticatedAdminPlanosRoute
   '/_authenticated/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/vetorizar'
     | '/admin/assinaturas'
     | '/admin/pagamentos'
+    | '/admin/planos'
     | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/vetorizar'
     | '/admin/assinaturas'
     | '/admin/pagamentos'
+    | '/admin/planos'
     | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
@@ -330,6 +342,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vetorizar'
     | '/_authenticated/admin/assinaturas'
     | '/_authenticated/admin/pagamentos'
+    | '/_authenticated/admin/planos'
     | '/_authenticated/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
@@ -482,6 +495,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPagamentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/planos': {
+      id: '/_authenticated/admin/planos'
+      path: '/admin/planos'
+      fullPath: '/admin/planos'
+      preLoaderRoute: typeof AuthenticatedAdminPlanosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/projetos/': {
       id: '/_authenticated/projetos/'
       path: '/projetos'
@@ -553,6 +573,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
   AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
   AuthenticatedAdminPagamentosRoute: typeof AuthenticatedAdminPagamentosRoute
+  AuthenticatedAdminPlanosRoute: typeof AuthenticatedAdminPlanosRoute
   AuthenticatedProjetosIdRoute: typeof AuthenticatedProjetosIdRoute
   AuthenticatedProjetosIndexRoute: typeof AuthenticatedProjetosIndexRoute
   AuthenticatedAdminAssinantesIdRoute: typeof AuthenticatedAdminAssinantesIdRoute
@@ -571,6 +592,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
   AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
   AuthenticatedAdminPagamentosRoute: AuthenticatedAdminPagamentosRoute,
+  AuthenticatedAdminPlanosRoute: AuthenticatedAdminPlanosRoute,
   AuthenticatedProjetosIdRoute: AuthenticatedProjetosIdRoute,
   AuthenticatedProjetosIndexRoute: AuthenticatedProjetosIndexRoute,
   AuthenticatedAdminAssinantesIdRoute: AuthenticatedAdminAssinantesIdRoute,
