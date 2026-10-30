@@ -9,7 +9,7 @@ const ALLOWED_ELEMENTS = new Set([
 const ALLOWED_ATTRS = new Set([
   "width", "height", "viewBox", "version", "xmlns", "d", "fill", "stroke", "stroke-width",
   "opacity", "fill-opacity", "stroke-opacity", "fill-rule", "transform", "x", "y", "cx", "cy",
-  "r", "rx", "ry", "points", "x1", "y1", "x2", "y2", "desc",
+  "r", "rx", "ry", "points", "x1", "y1", "x2", "y2",
 ]);
 
 const SAFE_VALUE = /^[a-zA-Z0-9\s.,#%()+\-:/=]*$/;

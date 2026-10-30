@@ -43,7 +43,9 @@ async function trace(url: string, mode: ModeKey): Promise<string> {
   const mod: any = await import("imagetracerjs");
   const tracer = mod.default ?? mod;
   await new Promise((r) => setTimeout(r, 30));
-  return tracer.imagedataToSVG(imgd, { ...MODES[mode].opts, viewbox: true, desc: false, strokewidth: 0 }) as string;
+  const svg = tracer.imagedataToSVG(imgd, { ...MODES[mode].opts, viewbox: true, desc: false, strokewidth: 0 }) as string;
+  // Give the SVG intrinsic dimensions so it renders at the right size in previews and editors.
+  return svg.replace(/^<svg /, `<svg width="${w}" height="${h}" `);
 }
 
 function Vectorize() {
