@@ -962,6 +962,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _lock_user: { Args: { _uid: string }; Returns: undefined }
+      access_state: { Args: { _uid: string }; Returns: Json }
+      admin_adjust_credits: {
+        Args: {
+          _actor: string
+          _delta: number
+          _key: string
+          _reason: string
+          _uid: string
+        }
+        Returns: Json
+      }
+      consume_reservation: { Args: { _res: string }; Returns: boolean }
+      credit_balance: {
+        Args: { _uid: string }
+        Returns: {
+          available: number
+          reserved: number
+        }[]
+      }
+      expire_bucket_sources: {
+        Args: { _reason: string; _sources: string[]; _uid: string }
+        Returns: undefined
+      }
+      grant_credits: {
+        Args: {
+          _actor?: string
+          _amount: number
+          _expires_at: string
+          _grant_key: string
+          _invoice?: string
+          _reason: string
+          _source: string
+          _uid: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -969,6 +1006,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_access: { Args: never; Returns: Json }
+      promote_to_admin: { Args: { _email: string }; Returns: string }
+      reconcile_stale_operations: { Args: never; Returns: undefined }
+      release_reservation: {
+        Args: { _reason: string; _res: string }
+        Returns: boolean
+      }
+      reserve_operation_credits: { Args: { _op: string }; Returns: undefined }
+      start_trial: { Args: { _uid: string }; Returns: undefined }
+      sweep_expired_credits: { Args: { _uid: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "subscriber"
