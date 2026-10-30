@@ -21,7 +21,11 @@ import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
 import { Route as AuthenticatedInventarRouteImport } from './routes/_authenticated/inventar'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthenticatedVetorizarRouteImport } from './routes/_authenticated/vetorizar'
+import { Route as AuthenticatedProjetosIndexRouteImport } from './routes/_authenticated/projetos.index'
+import { Route as AuthenticatedProjetosIdRouteImport } from './routes/_authenticated/projetos.$id'
 import { Route as ApiAdminMediaRouteImport } from './routes/api/admin/media'
 import { Route as ApiAssetsUploadRouteImport } from './routes/api/assets/upload'
 import { Route as ApiPublicMediaNameRouteImport } from './routes/api/public/media.$name'
@@ -86,9 +90,30 @@ const AuthenticatedInventarRoute = AuthenticatedInventarRouteImport.update({
   path: '/inventar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVetorizarRoute = AuthenticatedVetorizarRouteImport.update({
   id: '/vetorizar',
   path: '/vetorizar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProjetosIndexRoute =
+  AuthenticatedProjetosIndexRouteImport.update({
+    id: '/projetos/',
+    path: '/projetos/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProjetosIdRoute = AuthenticatedProjetosIdRouteImport.update({
+  id: '/projetos/$id',
+  path: '/projetos/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiAdminMediaRoute = ApiAdminMediaRouteImport.update({
@@ -125,9 +150,13 @@ export interface FileRoutesByFullPath {
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/planos': typeof AuthenticatedPlanosRoute
   '/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/projetos/': typeof AuthenticatedProjetosIndexRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
@@ -143,9 +172,13 @@ export interface FileRoutesByTo {
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
   '/inventar': typeof AuthenticatedInventarRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/planos': typeof AuthenticatedPlanosRoute
   '/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/projetos': typeof AuthenticatedProjetosIndexRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
@@ -163,9 +196,13 @@ export interface FileRoutesById {
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
   '/_authenticated/inventar': typeof AuthenticatedInventarRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/_authenticated/vetorizar': typeof AuthenticatedVetorizarRoute
+  '/_authenticated/projetos/$id': typeof AuthenticatedProjetosIdRoute
   '/api/admin/media': typeof ApiAdminMediaRoute
   '/api/assets/upload': typeof ApiAssetsUploadRoute
+  '/_authenticated/projetos/': typeof AuthenticatedProjetosIndexRoute
   '/api/public/media/$name': typeof ApiPublicMediaNameRoute
   '/api/public/stripe/webhook/$mode': typeof ApiPublicStripeWebhookModeRoute
 }
@@ -183,9 +220,13 @@ export interface FileRouteTypes {
     | '/criar'
     | '/historico'
     | '/inventar'
+    | '/perfil'
+    | '/planos'
     | '/vetorizar'
+    | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/projetos/'
     | '/api/public/media/$name'
     | '/api/public/stripe/webhook/$mode'
   fileRoutesByTo: FileRoutesByTo
@@ -201,9 +242,13 @@ export interface FileRouteTypes {
     | '/criar'
     | '/historico'
     | '/inventar'
+    | '/perfil'
+    | '/planos'
     | '/vetorizar'
+    | '/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/projetos'
     | '/api/public/media/$name'
     | '/api/public/stripe/webhook/$mode'
   id:
@@ -220,9 +265,13 @@ export interface FileRouteTypes {
     | '/_authenticated/criar'
     | '/_authenticated/historico'
     | '/_authenticated/inventar'
+    | '/_authenticated/perfil'
+    | '/_authenticated/planos'
     | '/_authenticated/vetorizar'
+    | '/_authenticated/projetos/$id'
     | '/api/admin/media'
     | '/api/assets/upload'
+    | '/_authenticated/projetos/'
     | '/api/public/media/$name'
     | '/api/public/stripe/webhook/$mode'
   fileRoutesById: FileRoutesById
@@ -327,11 +376,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInventarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/planos': {
+      id: '/_authenticated/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof AuthenticatedPlanosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/vetorizar': {
       id: '/_authenticated/vetorizar'
       path: '/vetorizar'
       fullPath: '/vetorizar'
       preLoaderRoute: typeof AuthenticatedVetorizarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projetos/': {
+      id: '/_authenticated/projetos/'
+      path: '/projetos'
+      fullPath: '/projetos/'
+      preLoaderRoute: typeof AuthenticatedProjetosIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projetos/$id': {
+      id: '/_authenticated/projetos/$id'
+      path: '/projetos/$id'
+      fullPath: '/projetos/$id'
+      preLoaderRoute: typeof AuthenticatedProjetosIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/admin/media': {
@@ -371,7 +448,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
   AuthenticatedInventarRoute: typeof AuthenticatedInventarRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
   AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
+  AuthenticatedProjetosIdRoute: typeof AuthenticatedProjetosIdRoute
+  AuthenticatedProjetosIndexRoute: typeof AuthenticatedProjetosIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -380,7 +461,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
   AuthenticatedInventarRoute: AuthenticatedInventarRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
   AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
+  AuthenticatedProjetosIdRoute: AuthenticatedProjetosIdRoute,
+  AuthenticatedProjetosIndexRoute: AuthenticatedProjetosIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
