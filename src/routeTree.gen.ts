@@ -16,6 +16,7 @@ import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAgentesRouteImport } from './routes/_authenticated/agentes'
 import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
@@ -72,6 +73,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAgentesRoute = AuthenticatedAgentesRouteImport.update({
   id: '/agentes',
   path: '/agentes',
@@ -119,27 +125,27 @@ const AuthenticatedVetorizarRoute = AuthenticatedVetorizarRouteImport.update({
 } as any)
 const AuthenticatedAdminAssinaturasRoute =
   AuthenticatedAdminAssinaturasRouteImport.update({
-    id: '/admin/assinaturas',
-    path: '/admin/assinaturas',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/assinaturas',
+    path: '/assinaturas',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminConfiguracoesRoute =
   AuthenticatedAdminConfiguracoesRouteImport.update({
-    id: '/admin/configuracoes',
-    path: '/admin/configuracoes',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminPagamentosRoute =
   AuthenticatedAdminPagamentosRouteImport.update({
-    id: '/admin/pagamentos',
-    path: '/admin/pagamentos',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/pagamentos',
+    path: '/pagamentos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminPlanosRoute =
   AuthenticatedAdminPlanosRouteImport.update({
-    id: '/admin/planos',
-    path: '/admin/planos',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/planos',
+    path: '/planos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedProjetosIndexRoute =
   AuthenticatedProjetosIndexRouteImport.update({
@@ -164,15 +170,15 @@ const ApiAssetsUploadRoute = ApiAssetsUploadRouteImport.update({
 } as any)
 const AuthenticatedAdminAssinantesIndexRoute =
   AuthenticatedAdminAssinantesIndexRouteImport.update({
-    id: '/admin/assinantes/',
-    path: '/admin/assinantes/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/assinantes/',
+    path: '/assinantes/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminAssinantesIdRoute =
   AuthenticatedAdminAssinantesIdRouteImport.update({
-    id: '/admin/assinantes/$id',
-    path: '/admin/assinantes/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/assinantes/$id',
+    path: '/assinantes/$id',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const ApiPublicMediaNameRoute = ApiPublicMediaNameRouteImport.update({
   id: '/api/public/media/$name',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/agentes': typeof AuthenticatedAgentesRoute
   '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/agentes': typeof AuthenticatedAgentesRoute
   '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/agentes': typeof AuthenticatedAgentesRoute
   '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/admin'
     | '/agentes'
     | '/creditos'
     | '/criar'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/admin'
     | '/agentes'
     | '/creditos'
     | '/criar'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/recuperar-senha'
     | '/reset-password'
+    | '/_authenticated/admin'
     | '/_authenticated/agentes'
     | '/_authenticated/creditos'
     | '/_authenticated/criar'
@@ -431,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agentes': {
       id: '/_authenticated/agentes'
       path: '/agentes'
@@ -496,31 +515,31 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/assinaturas': {
       id: '/_authenticated/admin/assinaturas'
-      path: '/admin/assinaturas'
+      path: '/assinaturas'
       fullPath: '/admin/assinaturas'
       preLoaderRoute: typeof AuthenticatedAdminAssinaturasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/configuracoes': {
       id: '/_authenticated/admin/configuracoes'
-      path: '/admin/configuracoes'
+      path: '/configuracoes'
       fullPath: '/admin/configuracoes'
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/pagamentos': {
       id: '/_authenticated/admin/pagamentos'
-      path: '/admin/pagamentos'
+      path: '/pagamentos'
       fullPath: '/admin/pagamentos'
       preLoaderRoute: typeof AuthenticatedAdminPagamentosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/planos': {
       id: '/_authenticated/admin/planos'
-      path: '/admin/planos'
+      path: '/planos'
       fullPath: '/admin/planos'
       preLoaderRoute: typeof AuthenticatedAdminPlanosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/projetos/': {
       id: '/_authenticated/projetos/'
@@ -552,17 +571,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/assinantes/': {
       id: '/_authenticated/admin/assinantes/'
-      path: '/admin/assinantes'
+      path: '/assinantes'
       fullPath: '/admin/assinantes/'
       preLoaderRoute: typeof AuthenticatedAdminAssinantesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/assinantes/$id': {
       id: '/_authenticated/admin/assinantes/$id'
-      path: '/admin/assinantes/$id'
+      path: '/assinantes/$id'
       fullPath: '/admin/assinantes/$id'
       preLoaderRoute: typeof AuthenticatedAdminAssinantesIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/media/$name': {
       id: '/api/public/media/$name'
@@ -581,7 +600,33 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminPagamentosRoute: typeof AuthenticatedAdminPagamentosRoute
+  AuthenticatedAdminPlanosRoute: typeof AuthenticatedAdminPlanosRoute
+  AuthenticatedAdminAssinantesIdRoute: typeof AuthenticatedAdminAssinantesIdRoute
+  AuthenticatedAdminAssinantesIndexRoute: typeof AuthenticatedAdminAssinantesIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
+    AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+    AuthenticatedAdminPagamentosRoute: AuthenticatedAdminPagamentosRoute,
+    AuthenticatedAdminPlanosRoute: AuthenticatedAdminPlanosRoute,
+    AuthenticatedAdminAssinantesIdRoute: AuthenticatedAdminAssinantesIdRoute,
+    AuthenticatedAdminAssinantesIndexRoute:
+      AuthenticatedAdminAssinantesIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedAgentesRoute: typeof AuthenticatedAgentesRoute
   AuthenticatedCreditosRoute: typeof AuthenticatedCreditosRoute
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
@@ -591,17 +636,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
   AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
-  AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
-  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
-  AuthenticatedAdminPagamentosRoute: typeof AuthenticatedAdminPagamentosRoute
-  AuthenticatedAdminPlanosRoute: typeof AuthenticatedAdminPlanosRoute
   AuthenticatedProjetosIdRoute: typeof AuthenticatedProjetosIdRoute
   AuthenticatedProjetosIndexRoute: typeof AuthenticatedProjetosIndexRoute
-  AuthenticatedAdminAssinantesIdRoute: typeof AuthenticatedAdminAssinantesIdRoute
-  AuthenticatedAdminAssinantesIndexRoute: typeof AuthenticatedAdminAssinantesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedAgentesRoute: AuthenticatedAgentesRoute,
   AuthenticatedCreditosRoute: AuthenticatedCreditosRoute,
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
@@ -611,15 +651,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
   AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
-  AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
-  AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
-  AuthenticatedAdminPagamentosRoute: AuthenticatedAdminPagamentosRoute,
-  AuthenticatedAdminPlanosRoute: AuthenticatedAdminPlanosRoute,
   AuthenticatedProjetosIdRoute: AuthenticatedProjetosIdRoute,
   AuthenticatedProjetosIndexRoute: AuthenticatedProjetosIndexRoute,
-  AuthenticatedAdminAssinantesIdRoute: AuthenticatedAdminAssinantesIdRoute,
-  AuthenticatedAdminAssinantesIndexRoute:
-    AuthenticatedAdminAssinantesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
