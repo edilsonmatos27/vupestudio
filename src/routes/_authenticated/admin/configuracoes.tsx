@@ -237,7 +237,7 @@ function Stripe() {
     setBusy("mode");
     try { await adminSetStripeMode({ data: modeDialog }); toast.success("Ambiente ativo alterado."); setModeDialog(null); qc.invalidateQueries(); } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(null); }
   };
-  const Check = ({ ok, label, detail }: { ok: boolean; label: string; detail?: string }) => (
+  const Check = ({ ok, label, detail }: { ok: boolean; label: string; detail?: string | undefined }) => (
     <div className="flex items-start gap-2 text-sm">{ok ? <CheckCircle2 className="mt-0.5 size-4 text-success" /> : <XCircle className="mt-0.5 size-4 text-muted-foreground" />}<div><p className="font-medium">{label}</p>{detail && <p className="text-xs text-muted-foreground">{detail}</p>}</div></div>
   );
 
