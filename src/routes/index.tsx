@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Layers, PenTool, Sparkles, Wand2 } from "lucide-react";
-import heroBefore from "@/assets/hero-antes.jpg.asset.json";
-import heroAfter from "@/assets/hero-depois.jpg.asset.json";
+import heroBefore from "@/assets/hero-antes.png.asset.json";
+import heroAfter from "@/assets/hero-depois.png.asset.json";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { BrandMark } from "@/components/brand";
@@ -111,9 +111,9 @@ function Landing() {
               afterSrc={heroAfter.url}
               beforeAlt="Foto original de uma atleta com tênis em ambiente urbano"
               afterAlt="Mesma foto transformada em anúncio esportivo Olympikus Corre 5"
-              width={790}
+              width={1586}
               height={992}
-              className="relative mx-auto max-w-md rounded-[2rem] border shadow-soft"
+              className="relative w-full rounded-[2rem] border shadow-soft"
             />
           </ScrollReveal>
         </div>
