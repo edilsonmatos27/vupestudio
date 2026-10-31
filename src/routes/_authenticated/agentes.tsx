@@ -34,11 +34,13 @@ import {
   adminListAgents,
   adminSaveAgent,
   adminSetAgentStatus,
+  adminSetAgentOrder,
   listMyAgents,
 } from "@/functions/agents.functions";
 import { adminListPlans } from "@/functions/plans.functions";
 import { useMe } from "@/hooks/use-me";
 import { errorMessage, formatDate, uploadMedia, validateImageFile } from "@/lib/client-api";
+import { agentDisplayOrder } from "@/lib/agent-order";
 
 export const Route = createFileRoute("/_authenticated/agentes")({
   head: () => ({
@@ -51,6 +53,70 @@ export const Route = createFileRoute("/_authenticated/agentes")({
 });
 
 type Agent = Awaited<ReturnType<typeof listMyAgents>>[number];
+
+function AgentOrderControl({ agent, onSaved }: { agent: Agent; onSaved: () => Promise<void> }) {
+  const current = agentDisplayOrder(agent.settings);
+  const [value, setValue] = useState(current === null ? "" : String(current));
+  const [saving, setSaving] = useState(false);
+  const unchanged = value === (current === null ? "" : String(current));
+
+  return (
+    <form
+      className="flex items-end gap-2"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        if (saving || unchanged) return;
+        const position = value.trim() === "" ? null : Number(value);
+        if (
+          position !== null &&
+          (!Number.isInteger(position) || position < 1 || position > 1_000_000)
+        ) {
+          toast.error("Use uma posição inteira entre 1 e 1.000.000.");
+          return;
+        }
+        setSaving(true);
+        try {
+          await adminSetAgentOrder({ data: { id: agent.id, position } });
+          await onSaved();
+          toast.success("Ordem de exibição salva.");
+        } catch (error) {
+          toast.error(errorMessage(error));
+        } finally {
+          setSaving(false);
+        }
+      }}
+    >
+      <div className="space-y-1">
+        <Label htmlFor={`agent-order-${agent.id}`} className="text-xs">
+          Ordem de exibição
+        </Label>
+        <Input
+          id={`agent-order-${agent.id}`}
+          aria-label={`Ordem de exibição de ${agent.name}`}
+          className="w-28"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={1_000_000}
+          step={1}
+          placeholder="Sem posição"
+          value={value}
+          disabled={saving}
+          onChange={(event) => setValue(event.target.value)}
+        />
+      </div>
+      <Button
+        type="submit"
+        size="sm"
+        variant="outline"
+        disabled={saving || unchanged}
+        aria-label={`Salvar ordem de ${agent.name}`}
+      >
+        {saving && <Loader2 className="size-4 animate-spin" />} Salvar
+      </Button>
+    </form>
+  );
+}
 
 function AgentGrid() {
   const navigate = useNavigate();
@@ -130,6 +196,13 @@ function AdminAgents() {
   const [del, setDel] = useState<Agent | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
 
+  const refreshOrder = async () => {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["admin-agents"] }),
+      qc.invalidateQueries({ queryKey: ["my-agents"] }),
+    ]);
+  };
+
   const open = async (a?: Agent) => {
     if (!a) {
       setEdit({ ...empty });
@@ -195,7 +268,12 @@ function AdminAgents() {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          Defina a ordem dos cards: 1 aparece primeiro, depois 2, 3 e assim por diante. Clique em
+          Salvar em cada agente. Sem posição, ele aparece ao final; números iguais seguem a ordem
+          alfabética.
+        </p>
         <Button onClick={() => open()}>
           <Plus /> Novo agente
         </Button>
@@ -231,6 +309,11 @@ function AdminAgents() {
                   Atualizado {formatDate(a.updated_at)}
                 </p>
               </div>
+              <AgentOrderControl
+                key={`${a.id}:${agentDisplayOrder(a.settings)}`}
+                agent={a}
+                onSaved={refreshOrder}
+              />
               <StatusBadge status={a.status} />
               <Switch
                 checked={a.status === "active"}

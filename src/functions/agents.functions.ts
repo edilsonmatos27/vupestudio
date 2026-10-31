@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sortAgentsForDisplay } from "@/lib/agent-order";
 
 const PUBLIC_COLS =
   "id, name, public_description, image_url, purpose, status, settings, allowed_plan_ids, current_version, created_at, updated_at";
@@ -11,18 +12,21 @@ export const listMyAgents = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const U = await import("@/lib/server-utils.server");
     const access = await U.getAccess(context.userId);
-    const { data } = await U.supabaseAdmin
+    const { data, error } = await U.supabaseAdmin
       .from("agents")
       .select(PUBLIC_COLS)
       .eq("status", "active")
       .is("deleted_at", null)
       .order("name");
     const planId = access.plan_id;
-    return (data ?? []).filter(
-      (a) =>
-        access.code === "admin" ||
-        !a.allowed_plan_ids.length ||
-        (planId && a.allowed_plan_ids.includes(planId)),
+    if (error) throw new Error("Não foi possível carregar os agentes.");
+    return sortAgentsForDisplay(
+      (data ?? []).filter(
+        (a) =>
+          access.code === "admin" ||
+          !a.allowed_plan_ids.length ||
+          (planId && a.allowed_plan_ids.includes(planId)),
+      ),
     );
   });
 
@@ -31,12 +35,67 @@ export const adminListAgents = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const U = await import("@/lib/server-utils.server");
     await U.assertAdmin(context.supabase, context.userId);
-    const { data } = await U.supabaseAdmin
+    const { data, error } = await U.supabaseAdmin
       .from("agents")
       .select(PUBLIC_COLS)
       .is("deleted_at", null)
-      .order("created_at", { ascending: false });
-    return data ?? [];
+      .order("name");
+    if (error) throw new Error("Não foi possível carregar os agentes.");
+    return sortAgentsForDisplay(data ?? []);
+  });
+
+/** One atomic row update; the position is stored in the existing settings JSON. */
+export const adminSetAgentOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        position: z.number().int().min(1).max(1_000_000).nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const U = await import("@/lib/server-utils.server");
+    await U.assertAdmin(context.supabase, context.userId);
+    const db = U.supabaseAdmin;
+    const { data: previous, error: readError } = await db
+      .from("agents")
+      .select("settings, updated_at")
+      .eq("id", data.id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (readError) throw new Error("Não foi possível consultar o agente.");
+    if (!previous) throw new Error("Agente não encontrado.");
+    const settings =
+      previous.settings &&
+      typeof previous.settings === "object" &&
+      !Array.isArray(previous.settings)
+        ? { ...previous.settings }
+        : {};
+    if (data.position === null) delete settings["display_order"];
+    else settings["display_order"] = data.position;
+    const { data: saved, error } = await db
+      .from("agents")
+      .update({ settings, updated_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .eq("updated_at", previous.updated_at)
+      .is("deleted_at", null)
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Não foi possível salvar a ordem do agente.");
+    if (!saved)
+      throw new Error(
+        "Este agente foi alterado em outra sessão. Atualize a lista e tente novamente.",
+      );
+    await U.audit({
+      actor_id: context.userId,
+      action: "agent_order_updated",
+      target_type: "agent",
+      target_id: data.id,
+      details: { position: data.position },
+    });
+    return { ok: true };
   });
 
 /** Admin-only: returns the private base prompt for editing. Never used by subscriber flows. */
@@ -82,11 +141,11 @@ export const adminSaveAgent = createServerFn({ method: "POST" })
     if (data.image_url && !data.image_url.startsWith("/api/public/media/"))
       throw new Error("Imagem inválida.");
     const db = U.supabaseAdmin;
-    const { id, base_prompt, ...fields } = data;
+    const { id, base_prompt, settings, ...fields } = data;
     if (!id) {
       const { data: a, error } = await db
         .from("agents")
-        .insert({ ...fields, status: "inactive", current_version: 1 } as never)
+        .insert({ ...fields, settings, status: "inactive", current_version: 1 } as never)
         .select(PUBLIC_COLS)
         .single();
       if (error || !a) throw new Error("Falha ao criar o agente.");
@@ -107,7 +166,7 @@ export const adminSaveAgent = createServerFn({ method: "POST" })
     }
     const { data: prev } = await db
       .from("agents")
-      .select("current_version, name")
+      .select("current_version, name, settings")
       .eq("id", id)
       .single();
     if (!prev) throw new Error("Agente não encontrado.");
@@ -128,9 +187,19 @@ export const adminSaveAgent = createServerFn({ method: "POST" })
         created_by: context.userId,
       });
     }
+    const previousSettings =
+      prev.settings && typeof prev.settings === "object" && !Array.isArray(prev.settings)
+        ? prev.settings
+        : {};
     const { data: a, error } = await db
       .from("agents")
-      .update({ ...fields, current_version: version } as never)
+      .update({
+        ...fields,
+        // The current editor sends {}. Leave settings untouched in that case so
+        // editing a prompt never resets the order (including concurrent changes).
+        ...(Object.keys(settings).length ? { settings: { ...previousSettings, ...settings } } : {}),
+        current_version: version,
+      } as never)
       .eq("id", id)
       .select(PUBLIC_COLS)
       .single();
