@@ -89,7 +89,7 @@ export function UploadZone({
               e.preventDefault();
               add(e.dataTransfer.files);
             }}
-            className="flex size-20 flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+            className="button-motion flex size-20 flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
           >
             {busy ? <Loader2 className="size-5 animate-spin" /> : <ImagePlus className="size-5" />}
             {busy ? "Enviando" : "Adicionar"}

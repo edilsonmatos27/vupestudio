@@ -116,7 +116,7 @@ function Projects() {
               key={p.id}
               to="/projetos/$id"
               params={{ id: p.id }}
-              className="rounded-3xl border bg-card p-5 shadow-soft transition-transform hover:-translate-y-0.5"
+              className="interactive-card rounded-3xl border bg-card p-5 shadow-soft"
             >
               <FolderOpen className="size-6 text-primary" />
               <h3 className="mt-3 text-lg font-semibold">{p.name}</h3>

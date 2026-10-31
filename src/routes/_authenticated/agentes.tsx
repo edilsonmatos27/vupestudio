@@ -70,7 +70,7 @@ function AgentGrid() {
       {q.data.map((a) => (
         <div
           key={a.id}
-          className="flex flex-col overflow-hidden rounded-3xl border bg-card shadow-soft"
+          className="interactive-card flex flex-col overflow-hidden rounded-3xl border bg-card shadow-soft"
         >
           <div className="aspect-[16/10] bg-muted">
             {a.image_url ? (

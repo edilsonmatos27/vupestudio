@@ -109,7 +109,10 @@ function Landing() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURE_CARDS.map((f) => (
-            <div key={f.title} className="rounded-3xl border bg-panel p-6 shadow-soft">
+            <div
+              key={f.title}
+              className="interactive-card rounded-3xl border bg-panel p-6 shadow-soft"
+            >
               <div className="flex size-11 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                 <f.icon className="size-5" />
               </div>
@@ -136,7 +139,7 @@ function Landing() {
           {plans.data?.map((p) => (
             <div
               key={p.id}
-              className={`flex flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
+              className={`interactive-card flex flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
             >
               {p.highlight && (
                 <span className="mb-3 self-start rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">

@@ -99,7 +99,7 @@ function NavList({
             to={it.to}
             onClick={onNavigate}
             title={collapsed ? it.label : undefined}
-            className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`nav-motion group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
               active
                 ? "bg-nav-active text-sidebar-accent-foreground"
                 : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
@@ -116,6 +116,7 @@ function NavList({
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: me } = useMe();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -145,9 +146,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const initials = (me?.profile?.name || me?.profile?.email || "?").slice(0, 1).toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div
+      className={`flex min-h-screen bg-background transition-[padding] duration-200 ${collapsed ? "lg:pl-[100px]" : "lg:pl-[280px]"}`}
+    >
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
+        className={`fixed inset-y-3 left-3 z-40 hidden flex-col overflow-hidden rounded-3xl border border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 shadow-soft transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
       >
         <div
           className={`mb-6 flex items-center px-2 pt-2 ${collapsed ? "justify-center" : "justify-between"}`}
@@ -156,12 +159,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <BrandMark collapsed={collapsed} inverted />
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <NavList items={items} collapsed={collapsed} />
         </div>
         <button
           onClick={toggleCollapsed}
-          className="mt-3 flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          className="button-motion mt-3 flex shrink-0 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
         >
           {collapsed ? (
@@ -177,7 +180,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent
           side="left"
-          className="w-72 border-sidebar-border bg-sidebar bg-sidebar-gradient p-4"
+          className="sidebar-scroll w-72 overflow-y-auto rounded-r-3xl border-sidebar-border bg-sidebar bg-sidebar-gradient p-4"
         >
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="mb-6 px-2 pt-1">
@@ -188,7 +191,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-3 z-30 mx-3 mt-3 flex h-16 shrink-0 items-center gap-3 rounded-2xl border bg-background/85 px-4 shadow-soft backdrop-blur-xl sm:px-6">
           <Button
             variant="ghost"
             size="icon"
@@ -214,7 +217,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex size-9 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground"
+                className="button-motion flex size-9 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground"
                 aria-label="Menu da conta"
               >
                 {initials}
@@ -256,7 +259,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:py-8">
           <AccessBanner />
-          {children}
+          <div key={pathname} className="page-enter">
+            {children}
+          </div>
         </main>
       </div>
     </div>
