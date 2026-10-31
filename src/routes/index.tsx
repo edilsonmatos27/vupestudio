@@ -111,8 +111,8 @@ function Landing() {
               afterSrc={heroAfter.url}
               beforeAlt="Foto original de uma atleta com tênis em ambiente urbano"
               afterAlt="Mesma foto transformada em anúncio esportivo Olympikus Corre 5"
-              width={770}
-              height={952}
+              width={790}
+              height={992}
               className="relative mx-auto max-w-md rounded-[2rem] border shadow-soft"
             />
           </ScrollReveal>
