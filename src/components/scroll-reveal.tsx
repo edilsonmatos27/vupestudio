@@ -26,17 +26,17 @@ export function ScrollReveal({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
-          element.dataset.reveal = "visible";
+          element.dataset["reveal"] = "visible";
           observer.disconnect();
         }
       },
       { threshold: 0.12, rootMargin: "0px 0px -24px 0px" },
     );
-    element.dataset.reveal = "pending";
+    element.dataset["reveal"] = "pending";
     observer.observe(element);
     return () => {
       observer.disconnect();
-      delete element.dataset.reveal;
+      delete element.dataset["reveal"];
     };
   }, []);
 
