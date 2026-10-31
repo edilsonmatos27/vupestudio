@@ -7,6 +7,18 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  plugins: [
+    {
+      name: "photon-wasm-module",
+      enforce: "pre",
+      transform(code, id) {
+        if (!id.replaceAll("\\", "/").endsWith("/@cf-wasm/photon/dist/workerd.js")) return;
+        // Photon supplies its own wasm-bindgen imports. Nitro must return the raw
+        // WebAssembly.Module rather than instantiate it with an empty imports object.
+        return code.replace('"./lib/photon_rs_bg.wasm"', '"./lib/photon_rs_bg.wasm?module"');
+      },
+    },
+  ],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

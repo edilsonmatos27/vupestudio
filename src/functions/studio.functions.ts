@@ -416,11 +416,13 @@ export const runItem = createServerFn({ method: "POST" })
       if (!a || a.deleted_at) return fail("Um arquivo de entrada foi removido.");
       const { data: blob, error } = await db.storage.from("vupe-assets").download(a.storage_path);
       if (error || !blob) return fail("Não foi possível ler um arquivo de entrada.");
-      images.push({
-        bytes: new Uint8Array(await blob.arrayBuffer()),
-        mime: a.mime,
-        name: a.filename,
-      });
+      const I = await import("@/lib/input-image.server");
+      try {
+        images.push(I.normalizeInputImage(new Uint8Array(await blob.arrayBuffer()), a.filename));
+      } catch (e) {
+        if (e instanceof I.InputImageError) return fail(e.message);
+        throw e;
+      }
     }
 
     let basePrompt: string | null = null;

@@ -33,6 +33,12 @@ function apiKey() {
 }
 
 function friendly(status: number, raw: string, code?: string): GatewayError {
+  if (code === "invalid_image" || /invalid input image|invalid image file/i.test(raw))
+    return new GatewayError(
+      400,
+      "invalid_image",
+      "O serviço de IA não conseguiu ler uma das imagens de referência. Remova e envie novamente as imagens da composição como PNG ou JPG. Se persistir, tente outro modelo.",
+    );
   if (code === "content_policy_violation" || code === "moderation_blocked")
     return new GatewayError(
       400,

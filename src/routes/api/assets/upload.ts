@@ -26,10 +26,15 @@ export const Route = createFileRoute("/api/assets/upload")({
           if (file.size > 10 * 1024 * 1024)
             throw new U.AppError("too_large", "Arquivo acima de 10 MB.");
           if (file.size === 0) throw new U.AppError("bad_request", "Arquivo vazio.");
-          const bytes = new Uint8Array(await file.arrayBuffer());
-          const mime = U.detectImageMime(bytes);
-          if (!mime)
-            throw new U.AppError("bad_type", "Formato não suportado. Use PNG, JPG ou WEBP.");
+          const I = await import("@/lib/input-image.server");
+          let normalized;
+          try {
+            normalized = I.normalizeInputImage(new Uint8Array(await file.arrayBuffer()), file.name);
+          } catch (e) {
+            if (e instanceof I.InputImageError) throw new U.AppError("invalid_image", e.message);
+            throw e;
+          }
+          const { bytes, mime } = normalized;
 
           let parentId: string | null = null;
           let projectId: string | null = null;
@@ -65,9 +70,7 @@ export const Route = createFileRoute("/api/assets/upload")({
             .upload(path, bytes, { contentType: mime });
           if (error)
             throw new U.AppError("storage", "Falha ao armazenar o arquivo. Tente novamente.", 502);
-          const safeName = (file.name || `arquivo.${ext}`)
-            .replace(/[^\w.\- ]+/g, "_")
-            .slice(0, 100);
+          const safeName = normalized.name.replace(/[^\w.\- ]+/g, "_").slice(0, 100);
           const { error: insErr } = await db.from("assets").insert({
             id,
             user_id: userId,

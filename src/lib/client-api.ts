@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { UPLOAD_LIMITS } from "./models";
+import { normalizeUpload } from "./normalize-upload";
 
 export type UploadedAsset = { id: string; mime: string; url: string | null; filename: string };
 
@@ -10,7 +11,7 @@ async function token() {
   return t;
 }
 
-export function validateImageFile(file: File) {
+export function validateImageFile(file: Blob) {
   if (!UPLOAD_LIMITS.mimes.includes(file.type))
     return "Formato não suportado. Use PNG, JPG ou WEBP.";
   if (file.size > UPLOAD_LIMITS.maxBytes) return "Arquivo acima de 10 MB.";
@@ -24,11 +25,12 @@ export async function uploadAsset(
   extra?: Record<string, string>,
   filename = "imagem.png",
 ): Promise<UploadedAsset> {
+  const originalName = file instanceof File ? file.name : filename;
+  const validation = validateImageFile(file);
+  if (validation) throw new Error(validation);
+  const normalized = await normalizeUpload(file, originalName);
   const form = new FormData();
-  form.append(
-    "file",
-    file instanceof File ? file : new File([file], filename, { type: file.type }),
-  );
+  form.append("file", normalized);
   form.append("role", role);
   for (const [k, v] of Object.entries(extra ?? {})) form.append(k, v);
   const res = await fetch("/api/assets/upload", {
