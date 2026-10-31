@@ -146,11 +146,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const initials = (me?.profile?.name || me?.profile?.email || "?").slice(0, 1).toUpperCase();
 
   return (
-    <div
-      className={`flex min-h-screen bg-background transition-[padding] duration-200 ${collapsed ? "lg:pl-[100px]" : "lg:pl-[280px]"}`}
-    >
+    <div className="flex min-h-screen bg-background">
       <aside
-        className={`fixed inset-y-3 left-3 z-40 hidden flex-col overflow-hidden rounded-3xl border border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 shadow-soft transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
+        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
       >
         <div
           className={`mb-6 flex items-center px-2 pt-2 ${collapsed ? "justify-center" : "justify-between"}`}
@@ -180,7 +178,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent
           side="left"
-          className="sidebar-scroll w-72 overflow-y-auto rounded-r-3xl border-sidebar-border bg-sidebar bg-sidebar-gradient p-4"
+          className="sidebar-scroll w-72 overflow-y-auto border-sidebar-border bg-sidebar bg-sidebar-gradient p-4"
         >
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="mb-6 px-2 pt-1">
@@ -191,7 +189,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-3 z-30 mx-3 mt-3 flex h-16 shrink-0 items-center gap-3 rounded-2xl border bg-background/85 px-4 shadow-soft backdrop-blur-xl sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
           <Button
             variant="ghost"
             size="icon"
