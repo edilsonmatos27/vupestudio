@@ -21,7 +21,7 @@ import {
   Wand2,
   Receipt,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/hooks/use-me";
 import { BrandMark } from "@/components/brand";
@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { AccessBanner } from "@/components/access-banner";
+import { useWorkspaceMotion } from "@/components/workspace/use-workspace-motion";
+import "@/components/workspace/workspace.css";
 
 type Item = { to: string; label: string; icon: typeof Sparkles };
 
@@ -114,6 +116,8 @@ function NavList({
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: me } = useMe();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const shellRef = useRef<HTMLDivElement>(null);
+  useWorkspaceMotion(shellRef, pathname);
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -143,7 +147,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const initials = (me?.profile?.name || me?.profile?.email || "?").slice(0, 1).toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div ref={shellRef} className="workspace-cinematic flex min-h-screen bg-background">
+      <div className="workspace-ambient" aria-hidden="true" />
       <aside
         className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar bg-sidebar-gradient p-3 transition-[width] duration-200 lg:flex ${collapsed ? "w-[76px]" : "w-64"}`}
       >
@@ -186,7 +191,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
+        <header className="workspace-header sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
           <Button
             variant="ghost"
             size="icon"
@@ -254,7 +259,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:py-8">
           <AccessBanner />
-          <div key={pathname} className="page-enter">
+          <div key={pathname} data-workspace-content className="workspace-page">
             {children}
           </div>
         </main>

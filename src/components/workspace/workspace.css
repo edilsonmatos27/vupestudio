@@ -1,0 +1,93 @@
+.workspace-cinematic {
+  position: relative;
+  isolation: isolate;
+}
+.workspace-cinematic .workspace-ambient {
+  position: fixed;
+  top: 45px;
+  right: -180px;
+  z-index: -1;
+  width: min(85vw, 950px);
+  height: 650px;
+  pointer-events: none;
+  opacity: 0.65;
+  background: radial-gradient(
+    ellipse at 70% 25%,
+    color-mix(in srgb, var(--primary) 7%, transparent),
+    transparent 65%
+  );
+}
+.workspace-cinematic .workspace-header {
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+.workspace-cinematic .workspace-header[data-scrolled] {
+  background-color: color-mix(in srgb, var(--background) 90%, transparent);
+  backdrop-filter: blur(20px);
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
+  box-shadow: 0 6px 30px -24px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+.workspace-cinematic [data-workspace-interactive] {
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+.workspace-cinematic [data-workspace-interactive]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    400px circle at var(--workspace-x, 50%) var(--workspace-y, 50%),
+    color-mix(in srgb, var(--primary) 8%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.workspace-cinematic [data-workspace-interactive]:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .workspace-cinematic [data-workspace-interactive]:hover {
+    transform: perspective(1100px) translateY(-3px) rotateX(var(--workspace-tilt-x, 0deg))
+      rotateY(var(--workspace-tilt-y, 0deg));
+    border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+    box-shadow:
+      var(--shadow-soft),
+      0 10px 30px -23px color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  .workspace-cinematic [data-workspace-interactive]:hover::after {
+    opacity: 1;
+  }
+  .workspace-cinematic .button-motion:not(:disabled):hover {
+    box-shadow: 0 6px 20px -13px color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  .workspace-cinematic .nav-motion:not(.bg-nav-active):hover {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+}
+@media (max-width: 1023px) {
+  .workspace-cinematic .workspace-ambient {
+    opacity: 0.35;
+    height: 400px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-cinematic .workspace-header,
+  .workspace-cinematic [data-workspace-interactive],
+  .workspace-cinematic [data-workspace-interactive]::after {
+    transition: none !important;
+  }
+  .workspace-cinematic .workspace-ambient,
+  .workspace-cinematic [data-workspace-interactive] {
+    transform: none !important;
+  }
+}

@@ -12,7 +12,7 @@ export function useHomeMotion(ref: RefObject<HTMLDivElement | null>, planCount: 
     updateNav();
     window.addEventListener("scroll", updateNav, { passive: true });
 
-    // Separate chunks keep GSAP out of subscriber pages and leave content visible on failure.
+    // Load home animations only when this page mounts; leave content visible on failure.
     void Promise.all([import("gsap"), import("gsap/ScrollTrigger")])
       .then(([{ gsap }, { ScrollTrigger }]) => {
         if (cancelled) return;
