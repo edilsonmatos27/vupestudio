@@ -4,7 +4,11 @@ import { Bot, Box, ImagePlus, Layers, RotateCcw, Wand2 } from "lucide-react";
 import heroBefore from "@/assets/hero-antes.png.asset.json";
 import heroAfter from "@/assets/hero-depois.png.asset.json";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
-import { ScrollReveal } from "@/components/scroll-reveal";
+import { useRef } from "react";
+import { HomeReveal } from "@/components/home/home-reveal";
+import { HomeShowcase } from "@/components/home/home-showcase";
+import { useHomeMotion } from "@/components/home/use-home-motion";
+import "@/components/home/home.css";
 import { BrandMark } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { listPublicPlans } from "@/functions/account.functions";
@@ -60,8 +64,10 @@ const FEATURE_CARDS = [
 
 function Landing() {
   const plans = useQuery({ queryKey: ["public-plans"], queryFn: () => listPublicPlans() });
+  const homeRef = useRef<HTMLDivElement>(null);
+  useHomeMotion(homeRef, plans.data?.length ?? 0);
   return (
-    <div className="min-h-screen bg-background pt-28 sm:pt-32">
+    <div ref={homeRef} className="home-cinematic min-h-screen bg-background pt-28 sm:pt-32">
       <header className="landing-nav fixed inset-x-3 top-3 z-50 mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-3xl border border-border bg-background/85 px-3 py-3 shadow-soft backdrop-blur-xl sm:inset-x-6 sm:top-5 sm:px-6 sm:py-4">
         <Link to="/" aria-label="Vupe Studio — início" className="landing-brand min-w-0">
           <BrandMark />
@@ -76,26 +82,27 @@ function Landing() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-hero">
+      <section data-home-hero data-home-sequence className="relative overflow-hidden bg-hero">
+        <div className="home-ambient" aria-hidden="true" />
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
           <div>
-            <ScrollReveal>
+            <HomeReveal>
               <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
                 <Layers className="size-3.5 text-primary" /> Estúdio de imagens com IA
               </span>
-            </ScrollReveal>
-            <ScrollReveal delay={70} className="mt-5">
+            </HomeReveal>
+            <HomeReveal className="mt-5">
               <h1 className="text-4xl font-bold leading-[1.05] sm:text-6xl">
                 Da ideia à arte final, <span className="text-primary">no mesmo estúdio.</span>
               </h1>
-            </ScrollReveal>
-            <ScrollReveal delay={140} className="mt-5">
+            </HomeReveal>
+            <HomeReveal className="mt-5">
               <p className="max-w-xl text-lg text-muted-foreground">
                 Edite fotos, monte composições com seus produtos e logomarca e gere variações — com
                 agentes de IA que já conhecem o estilo certo.
               </p>
-            </ScrollReveal>
-            <ScrollReveal delay={210} className="mt-8">
+            </HomeReveal>
+            <HomeReveal className="mt-8">
               <div className="flex flex-wrap gap-3">
                 <Button asChild size="lg" variant="hero">
                   <Link to="/cadastro">Criar conta grátis</Link>
@@ -107,47 +114,56 @@ function Landing() {
               <p className="mt-4 text-xs text-muted-foreground">
                 Teste sem cartão. Nenhuma cobrança automática ao final do teste.
               </p>
-            </ScrollReveal>
+            </HomeReveal>
           </div>
-          <ScrollReveal delay={140} className="relative">
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-primary opacity-[0.06] blur-3xl" />
-            <BeforeAfterSlider
-              beforeSrc={heroBefore.url}
-              afterSrc={heroAfter.url}
-              beforeAlt="Foto original de uma atleta com tênis em ambiente urbano"
-              afterAlt="Mesma foto transformada em anúncio esportivo Olympikus Corre 5"
-              width={1586}
-              height={992}
-              className="relative w-full rounded-[2rem] border shadow-soft"
-            />
-          </ScrollReveal>
+          <HomeReveal className="relative">
+            <div className="home-hero-depth">
+              <div className="absolute -inset-6 rounded-[2.5rem] bg-primary opacity-[0.06] blur-3xl" />
+              <BeforeAfterSlider
+                beforeSrc={heroBefore.url}
+                afterSrc={heroAfter.url}
+                beforeAlt="Foto original de uma atleta com tênis em ambiente urbano"
+                afterAlt="Mesma foto transformada em anúncio esportivo Olympikus Corre 5"
+                width={1586}
+                height={992}
+                className="relative w-full rounded-[2rem] border shadow-soft"
+              />
+            </div>
+          </HomeReveal>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {FEATURE_CARDS.map((f, index) => (
-            <ScrollReveal key={f.title} delay={index * 80} className="h-full">
-              <div className="interactive-card h-full rounded-3xl border bg-panel p-6 shadow-soft">
+        <div data-home-sequence className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {FEATURE_CARDS.map((f) => (
+            <HomeReveal key={f.title} className="h-full">
+              <div
+                data-home-tilt
+                className="interactive-card h-full rounded-3xl border bg-panel p-6 shadow-soft"
+              >
                 <div className="flex size-11 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                   <f.icon className="size-5" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{f.text}</p>
               </div>
-            </ScrollReveal>
+            </HomeReveal>
           ))}
         </div>
       </section>
 
+      <HomeShowcase />
+
       <section id="planos" className="mx-auto scroll-mt-32 max-w-7xl px-4 pb-20 sm:px-6">
-        <ScrollReveal>
-          <h2 className="text-3xl font-bold">Planos</h2>
-          <p className="mt-1 text-muted-foreground">
-            Cada imagem gerada, editada ou variada com sucesso consome 1 crédito.
-          </p>
-        </ScrollReveal>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div data-home-sequence>
+          <HomeReveal>
+            <h2 className="text-3xl font-bold">Planos</h2>
+            <p className="mt-1 text-muted-foreground">
+              Cada imagem gerada, editada ou variada com sucesso consome 1 crédito.
+            </p>
+          </HomeReveal>
+        </div>
+        <div data-home-sequence className="mt-8 grid gap-4 md:grid-cols-3">
           {plans.isLoading && <p className="text-sm text-muted-foreground">Carregando planos…</p>}
           {plans.error && (
             <p className="text-sm text-destructive">Não foi possível carregar os planos.</p>
@@ -155,9 +171,10 @@ function Landing() {
           {plans.data?.length === 0 && (
             <p className="text-sm text-muted-foreground">Nenhum plano publicado no momento.</p>
           )}
-          {plans.data?.map((p, index) => (
-            <ScrollReveal key={p.id} delay={(index % 3) * 80} className="h-full">
+          {plans.data?.map((p) => (
+            <HomeReveal key={p.id} className="h-full">
               <div
+                data-home-tilt
                 className={`interactive-card flex h-full flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
               >
                 {p.highlight && (
@@ -188,12 +205,12 @@ function Landing() {
                   </Link>
                 </Button>
               </div>
-            </ScrollReveal>
+            </HomeReveal>
           ))}
         </div>
       </section>
 
-      <ScrollReveal>
+      <HomeReveal>
         <footer className="border-t">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:justify-between sm:px-6">
             <span>© {new Date().getFullYear()} Vupe Studio</span>
@@ -202,7 +219,7 @@ function Landing() {
             </Link>
           </div>
         </footer>
-      </ScrollReveal>
+      </HomeReveal>
     </div>
   );
 }

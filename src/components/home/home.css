@@ -1,0 +1,202 @@
+/* Every visual rule is scoped to the home or its own image dialog. */
+.home-cinematic {
+  overflow-x: clip;
+}
+.home-cinematic .landing-nav {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+.home-cinematic .landing-nav[data-scrolled] {
+  background-color: color-mix(in srgb, var(--background) 90%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
+  box-shadow:
+    var(--shadow-soft),
+    0 8px 40px -28px color-mix(in srgb, var(--primary) 28%, transparent);
+  backdrop-filter: blur(22px);
+}
+.home-cinematic .home-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-cinematic .home-ambient::before,
+.home-cinematic .home-ambient::after {
+  content: "";
+  position: absolute;
+  width: min(55vw, 660px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--primary) 11%, transparent),
+    transparent 68%
+  );
+}
+.home-cinematic .home-ambient::before {
+  top: -35%;
+  right: -8%;
+}
+.home-cinematic .home-ambient::after {
+  bottom: -70%;
+  left: -18%;
+  opacity: 0.5;
+}
+.home-cinematic [data-home-tilt] {
+  position: relative;
+  isolation: isolate;
+}
+.home-cinematic [data-home-tilt]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    460px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+    color-mix(in srgb, var(--primary) 8%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+.home-cinematic [data-home-reveal]:focus-within {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.home-cinematic .home-gallery-viewport {
+  overflow: hidden;
+  padding-block: 8px;
+  touch-action: pan-y pinch-zoom;
+  cursor: grab;
+  border-radius: 1.5rem;
+}
+.home-cinematic .home-gallery-viewport:active {
+  cursor: grabbing;
+}
+.home-cinematic .home-gallery-viewport:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 5px;
+}
+.home-cinematic .home-gallery-track {
+  display: flex;
+  gap: 20px;
+}
+.home-cinematic .home-gallery-slide {
+  flex: 0 0 84%;
+  min-width: 0;
+}
+.home-cinematic .home-gallery-image {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 1586 / 992;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--card);
+  text-align: left;
+  cursor: inherit;
+  transition:
+    border-color 240ms ease,
+    box-shadow 240ms ease;
+}
+.home-cinematic .home-gallery-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.home-cinematic .home-gallery-image:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -3px;
+}
+.home-cinematic .home-gallery-expand {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--background) 85%, transparent);
+  backdrop-filter: blur(8px);
+  opacity: 0.9;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+.home-showcase-dialog {
+  width: calc(100% - 24px);
+}
+.home-showcase-dialog img {
+  background: var(--card);
+}
+@media (min-width: 640px) {
+  .home-cinematic .home-gallery-slide {
+    flex-basis: 44%;
+  }
+}
+@media (min-width: 1024px) {
+  .home-cinematic .home-gallery-slide {
+    flex-basis: 29%;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .home-cinematic [data-home-tilt]:hover {
+    transform: perspective(1000px) translateY(-5px) rotateX(var(--tilt-x, 0deg))
+      rotateY(var(--tilt-y, 0deg));
+    border-color: color-mix(in srgb, var(--primary) 48%, var(--border));
+    box-shadow:
+      var(--shadow-soft),
+      0 16px 42px -28px color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  .home-cinematic [data-home-tilt]:hover::after {
+    opacity: 1;
+  }
+  .home-cinematic .button-motion:hover {
+    box-shadow: 0 7px 24px -12px color-mix(in srgb, var(--primary) 48%, transparent);
+  }
+  .home-cinematic .home-gallery-image:hover {
+    border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+    box-shadow: 0 8px 24px -15px color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+  .home-cinematic .home-gallery-image:hover .home-gallery-expand {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+@media (max-width: 639px) {
+  .home-cinematic .home-gallery-track {
+    gap: 14px;
+  }
+  .home-cinematic .home-gallery-image {
+    border-radius: 1.15rem;
+  }
+  .home-cinematic .home-ambient::before {
+    width: 100vw;
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-cinematic *,
+  .home-showcase-dialog {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .home-cinematic [data-home-reveal] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+  .home-cinematic .home-hero-depth,
+  .home-cinematic [data-home-tilt] {
+    transform: none !important;
+  }
+}
