@@ -124,7 +124,7 @@ const agentSchema = z.object({
   name: z.string().trim().min(1).max(80),
   public_description: z.string().max(500),
   image_url: z.string().max(500).nullable(),
-  purpose: z.enum(["invent", "create"]),
+  purpose: z.literal("create"),
   base_prompt: z.string().trim().min(1).max(8000),
   allowed_plan_ids: z.array(z.string().uuid()).max(50),
   settings: z

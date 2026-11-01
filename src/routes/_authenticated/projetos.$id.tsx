@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Pencil, PenTool, Sparkles, Trash2, Wand2 } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Trash2, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from "@/components/states";
@@ -107,18 +107,8 @@ function ProjectDetail() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild>
-            <Link to="/inventar">
-              <Sparkles /> Inventar
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
             <Link to="/criar">
               <Wand2 /> Criar
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to="/vetorizar">
-              <PenTool /> Vetorizar
             </Link>
           </Button>
           <Button

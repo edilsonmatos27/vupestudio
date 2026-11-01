@@ -47,10 +47,6 @@ function Privacy() {
             <b className="text-foreground">Pagamentos:</b> o checkout é feito pela Stripe. Não
             capturamos nem armazenamos dados de cartão.
           </p>
-          <p>
-            <b className="text-foreground">Vetorização:</b> é processada no seu navegador; somente o
-            SVG resultante é enviado para armazenamento.
-          </p>
           <h2>Retenção e exclusão</h2>
           <p>
             Você pode excluir imagens individuais e projetos a qualquer momento; os arquivos são

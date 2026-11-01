@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   MODEL_CATALOG,
+  FEATURES,
   NO_CREDITS_MESSAGE,
   TRIAL_EXPIRED_MESSAGE,
   findModel,
@@ -49,14 +50,14 @@ export const studioOptions = createServerFn({ method: "GET" })
       maxBatch: access.code === "admin" ? 3 : Math.min(3, access.max_batch ?? 1),
       features:
         access.code === "admin"
-          ? ["invent", "edit", "compose", "variation", "vectorize"]
-          : ((access.features ?? []) as string[]),
+          ? FEATURES.map((feature) => feature.id)
+          : (access.features ?? []).filter((id) => FEATURES.some((feature) => feature.id === id)),
       projects: projects ?? [],
     };
   });
 
 const opSchema = z.object({
-  type: z.enum(["invent", "edit", "compose", "variation"]),
+  type: z.enum(["edit", "compose", "variation"]),
   model: z.string().max(100),
   agentId: z.string().uuid().nullable().optional(),
   instructions: z.string().max(4000).default(""),
@@ -158,10 +159,6 @@ export const createOperation = createServerFn({ method: "POST" })
       if (data.instructions.trim().length < 3)
         throw new Error("Descreva como a composição deve ficar.");
       items = Array.from({ length: data.count }, () => ({ source_asset_id: ins.main[0] ?? null }));
-    } else {
-      if (data.instructions.trim().length < 3 && !data.agentId)
-        throw new Error("Descreva a imagem que deseja criar.");
-      items = Array.from({ length: data.count }, () => ({ source_asset_id: null }));
     }
     if (items.length > maxBatch)
       throw new Error(`Seu plano permite até ${maxBatch} resultado(s) por operação.`);
@@ -189,8 +186,9 @@ export const createOperation = createServerFn({ method: "POST" })
         (!access.plan_id || !a.allowed_plan_ids.includes(access.plan_id))
       )
         throw new Error("Este agente não está incluído no seu plano.");
-      const expected = data.type === "invent" ? "invent" : "create";
-      if (a.purpose !== expected) throw new Error("Este agente não é compatível com esta bancada.");
+      // Existing agents from the retired workbench remain usable with images.
+      if (a.purpose !== "create" && a.purpose !== "invent")
+        throw new Error("Este agente não é compatível com esta bancada.");
       agent = a;
       const { data: v } = await db
         .from("agent_versions")
@@ -375,6 +373,8 @@ export const runItem = createServerFn({ method: "POST" })
     if (op!.charged && !item.reservation_id) return fail("Reserva de créditos ausente.");
     const model = findModel(op!.model);
     if (!model) return fail("Modelo não encontrado.");
+    if (!model.tasks.includes(op!.type as Task))
+      return fail("Este recurso foi removido do Vupe Studio. Use Criar imagem.");
 
     // Load inputs in a fixed order with explicit roles
     const params = op!.params as any;
@@ -401,9 +401,6 @@ export const runItem = createServerFn({ method: "POST" })
         id,
         role: "brand logo to place in the image; keep its shapes, colors and text as close as possible",
       });
-    if (op!.type === "invent")
-      for (const id of ins.main ?? [])
-        if (!ordered.some((o) => o.id === id)) ordered.push({ id, role: "reference image" });
 
     const images: { bytes: Uint8Array; mime: string; name: string }[] = [];
     for (const o of ordered) {
@@ -672,202 +669,6 @@ export const moveAssetToProject = createServerFn({ method: "POST" })
       .select("id")
       .maybeSingle();
     if (!a) throw new Error("Arquivo não encontrado.");
-    return { ok: true };
-  });
-
-// ---------------- Vectorization (local tracing in the browser, authorized & stored by the server) ----------------
-export const startVectorize = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z
-      .object({
-        sourceAssetId: z.string().uuid(),
-        mode: z.enum(["logo", "drawing", "fewcolors", "illustration"]),
-        projectId: z.string().uuid().nullable().optional(),
-        idempotencyKey: z.string().uuid(),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data, context }) => {
-    const U = await import("@/lib/server-utils.server");
-    const db = U.supabaseAdmin;
-    const access = await U.getAccess(context.userId);
-    if (!access.ok) throw new Error(accessMessage(access.code, access.reason));
-    if (access.code !== "admin" && !(access.features ?? []).includes("vectorize"))
-      throw new Error("A vetorização não está incluída no seu plano.");
-    const { data: src } = await db
-      .from("assets")
-      .select("id, storage_path, mime")
-      .eq("id", data.sourceAssetId)
-      .eq("user_id", context.userId)
-      .is("deleted_at", null)
-      .maybeSingle();
-    if (!src || src.mime === "image/svg+xml") throw new Error("Arquivo de origem inválido.");
-    if (data.projectId) {
-      const { data: p } = await db
-        .from("projects")
-        .select("id")
-        .eq("id", data.projectId)
-        .eq("user_id", context.userId)
-        .is("deleted_at", null)
-        .maybeSingle();
-      if (!p) throw new Error("Projeto não encontrado.");
-    }
-    const { data: existing } = await db
-      .from("operations")
-      .select("id")
-      .eq("user_id", context.userId)
-      .eq("idempotency_key", data.idempotencyKey)
-      .maybeSingle();
-    let opId = existing?.id;
-    if (!opId) {
-      const { data: op, error } = await db
-        .from("operations")
-        .insert({
-          user_id: context.userId,
-          project_id: data.projectId ?? null,
-          type: "vectorize",
-          status: "running",
-          model: "imagetracerjs-1.2.6",
-          params: { mode: data.mode },
-          input_asset_ids: [src.id],
-          requested_count: 1,
-          credits_per_item: 0,
-          charged: false,
-          idempotency_key: data.idempotencyKey,
-        })
-        .select("id")
-        .single();
-      if (error || !op) throw new Error("Não foi possível iniciar a vetorização.");
-      opId = op.id;
-      await db.from("operation_items").insert({
-        operation_id: op.id,
-        user_id: context.userId,
-        idx: 0,
-        status: "running",
-        source_asset_id: src.id,
-        started_at: new Date().toISOString(),
-      });
-    }
-    const { data: item } = await db
-      .from("operation_items")
-      .select("id, status")
-      .eq("operation_id", opId)
-      .eq("idx", 0)
-      .single();
-    return { operationId: opId, itemId: item!.id, sourceUrl: await U.signedUrl(src.storage_path) };
-  });
-
-export const saveVector = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z
-      .object({
-        itemId: z.string().uuid(),
-        svg: z
-          .string()
-          .min(20)
-          .max(8 * 1024 * 1024),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data, context }) => {
-    const U = await import("@/lib/server-utils.server");
-    const { sanitizeSvg, SvgSanitizeError } = await import("@/lib/svg-sanitize");
-    const db = U.supabaseAdmin;
-    const { data: item } = await db
-      .from("operation_items")
-      .select("*")
-      .eq("id", data.itemId)
-      .eq("user_id", context.userId)
-      .eq("status", "running")
-      .maybeSingle();
-    if (!item) throw new Error("Vetorização não encontrada ou já concluída.");
-    const { data: op } = await db
-      .from("operations")
-      .select("id, type, project_id")
-      .eq("id", item.operation_id)
-      .single();
-    if (op?.type !== "vectorize") throw new Error("Operação inválida.");
-    let clean: string;
-    try {
-      clean = sanitizeSvg(data.svg).svg;
-    } catch (e) {
-      const msg = e instanceof SvgSanitizeError ? e.message : "SVG inválido.";
-      await db
-        .from("operation_items")
-        .update({ status: "failed", error: msg, finished_at: new Date().toISOString() })
-        .eq("id", item.id);
-      await refreshOperationStatus(db, op.id);
-      throw new Error(msg);
-    }
-    const bytes = new TextEncoder().encode(clean);
-    const assetId = crypto.randomUUID();
-    const path = `${context.userId}/vectors/${assetId}.svg`;
-    let stored = false;
-    for (let i = 1; i <= 3 && !stored; i++) {
-      const { error } = await db.storage
-        .from("vupe-assets")
-        .upload(path, bytes, { contentType: "image/svg+xml", upsert: true });
-      if (!error) stored = true;
-    }
-    if (!stored) {
-      await db
-        .from("operation_items")
-        .update({
-          status: "failed",
-          error: "Falha ao salvar o SVG.",
-          finished_at: new Date().toISOString(),
-        })
-        .eq("id", item.id);
-      await refreshOperationStatus(db, op.id);
-      throw new Error("Falha ao salvar o SVG.");
-    }
-    const { data: proj } = op.project_id
-      ? await db
-          .from("projects")
-          .select("id")
-          .eq("id", op.project_id)
-          .is("deleted_at", null)
-          .maybeSingle()
-      : { data: null };
-    await db.from("assets").insert({
-      id: assetId,
-      user_id: context.userId,
-      project_id: proj?.id ?? null,
-      operation_id: op.id,
-      operation_item_id: item.id,
-      parent_asset_id: item.source_asset_id,
-      kind: "vector",
-      storage_path: path,
-      mime: "image/svg+xml",
-      size_bytes: bytes.length,
-      filename: `vupe-vetor-${assetId.slice(0, 8)}.svg`,
-    });
-    await db
-      .from("operation_items")
-      .update({ status: "succeeded", asset_id: assetId, finished_at: new Date().toISOString() })
-      .eq("id", item.id);
-    await refreshOperationStatus(db, op.id);
-    return { assetId, url: await U.signedUrl(path) };
-  });
-
-export const failVector = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z.object({ itemId: z.string().uuid(), error: z.string().max(300) }).parse(d),
-  )
-  .handler(async ({ data, context }) => {
-    const U = await import("@/lib/server-utils.server");
-    const { data: item } = await U.supabaseAdmin
-      .from("operation_items")
-      .update({ status: "failed", error: data.error, finished_at: new Date().toISOString() })
-      .eq("id", data.itemId)
-      .eq("user_id", context.userId)
-      .eq("status", "running")
-      .select("operation_id")
-      .maybeSingle();
-    if (item) await refreshOperationStatus(U.supabaseAdmin, item.operation_id);
     return { ok: true };
   });
 

@@ -21,11 +21,9 @@ import { Route as AuthenticatedAgentesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCreditosRouteImport } from './routes/_authenticated/creditos'
 import { Route as AuthenticatedCriarRouteImport } from './routes/_authenticated/criar'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
-import { Route as AuthenticatedInventarRouteImport } from './routes/_authenticated/inventar'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
-import { Route as AuthenticatedVetorizarRouteImport } from './routes/_authenticated/vetorizar'
 import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin/assinaturas'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin/configuracoes'
 import { Route as AuthenticatedAdminPagamentosRouteImport } from './routes/_authenticated/admin/pagamentos'
@@ -98,11 +96,6 @@ const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
   path: '/historico',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedInventarRoute = AuthenticatedInventarRouteImport.update({
-  id: '/inventar',
-  path: '/inventar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -116,11 +109,6 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
 const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
   id: '/planos',
   path: '/planos',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedVetorizarRoute = AuthenticatedVetorizarRouteImport.update({
-  id: '/vetorizar',
-  path: '/vetorizar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminAssinaturasRoute =
@@ -204,11 +192,9 @@ export interface FileRoutesByFullPath {
   '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
-  '/inventar': typeof AuthenticatedInventarRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/planos': typeof AuthenticatedPlanosRoute
-  '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -234,11 +220,9 @@ export interface FileRoutesByTo {
   '/creditos': typeof AuthenticatedCreditosRoute
   '/criar': typeof AuthenticatedCriarRoute
   '/historico': typeof AuthenticatedHistoricoRoute
-  '/inventar': typeof AuthenticatedInventarRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/planos': typeof AuthenticatedPlanosRoute
-  '/vetorizar': typeof AuthenticatedVetorizarRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -266,11 +250,9 @@ export interface FileRoutesById {
   '/_authenticated/creditos': typeof AuthenticatedCreditosRoute
   '/_authenticated/criar': typeof AuthenticatedCriarRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
-  '/_authenticated/inventar': typeof AuthenticatedInventarRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
-  '/_authenticated/vetorizar': typeof AuthenticatedVetorizarRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
   '/_authenticated/admin/pagamentos': typeof AuthenticatedAdminPagamentosRoute
@@ -298,11 +280,9 @@ export interface FileRouteTypes {
     | '/creditos'
     | '/criar'
     | '/historico'
-    | '/inventar'
     | '/painel'
     | '/perfil'
     | '/planos'
-    | '/vetorizar'
     | '/admin/assinaturas'
     | '/admin/configuracoes'
     | '/admin/pagamentos'
@@ -328,11 +308,9 @@ export interface FileRouteTypes {
     | '/creditos'
     | '/criar'
     | '/historico'
-    | '/inventar'
     | '/painel'
     | '/perfil'
     | '/planos'
-    | '/vetorizar'
     | '/admin/assinaturas'
     | '/admin/configuracoes'
     | '/admin/pagamentos'
@@ -359,11 +337,9 @@ export interface FileRouteTypes {
     | '/_authenticated/creditos'
     | '/_authenticated/criar'
     | '/_authenticated/historico'
-    | '/_authenticated/inventar'
     | '/_authenticated/painel'
     | '/_authenticated/perfil'
     | '/_authenticated/planos'
-    | '/_authenticated/vetorizar'
     | '/_authenticated/admin/assinaturas'
     | '/_authenticated/admin/configuracoes'
     | '/_authenticated/admin/pagamentos'
@@ -478,13 +454,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/inventar': {
-      id: '/_authenticated/inventar'
-      path: '/inventar'
-      fullPath: '/inventar'
-      preLoaderRoute: typeof AuthenticatedInventarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -504,13 +473,6 @@ declare module '@tanstack/react-router' {
       path: '/planos'
       fullPath: '/planos'
       preLoaderRoute: typeof AuthenticatedPlanosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/vetorizar': {
-      id: '/_authenticated/vetorizar'
-      path: '/vetorizar'
-      fullPath: '/vetorizar'
-      preLoaderRoute: typeof AuthenticatedVetorizarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/assinaturas': {
@@ -631,11 +593,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreditosRoute: typeof AuthenticatedCreditosRoute
   AuthenticatedCriarRoute: typeof AuthenticatedCriarRoute
   AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
-  AuthenticatedInventarRoute: typeof AuthenticatedInventarRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
-  AuthenticatedVetorizarRoute: typeof AuthenticatedVetorizarRoute
   AuthenticatedProjetosIdRoute: typeof AuthenticatedProjetosIdRoute
   AuthenticatedProjetosIndexRoute: typeof AuthenticatedProjetosIndexRoute
 }
@@ -646,11 +606,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreditosRoute: AuthenticatedCreditosRoute,
   AuthenticatedCriarRoute: AuthenticatedCriarRoute,
   AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
-  AuthenticatedInventarRoute: AuthenticatedInventarRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
-  AuthenticatedVetorizarRoute: AuthenticatedVetorizarRoute,
   AuthenticatedProjetosIdRoute: AuthenticatedProjetosIdRoute,
   AuthenticatedProjetosIndexRoute: AuthenticatedProjetosIndexRoute,
 }

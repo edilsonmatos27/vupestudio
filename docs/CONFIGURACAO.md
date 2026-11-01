@@ -5,8 +5,8 @@
 - Teste gratuito iniciado uma única vez na confirmação do e-mail, com registro das condições concedidas (duração em minutos/horas/dias, créditos, recursos, modelos; global ou por plano).
 - Bloqueio de novas operações no servidor ao fim do teste, mesmo com créditos.
 - Créditos com reserva → consumo somente após o arquivo salvo → liberação em falhas; ledger completo; franquia não acumulativa; créditos de teste não migram; ajustes manuais auditados.
-- Geração, edição, composição e variações reais (até 3 por operação) pela IA gerenciada do Lovable.
-- Vetorização real em SVG (caminhos vetoriais, saneado no servidor), logomarca exata por sobreposição determinística.
+- Edição, composição e variações reais (até 3 por operação) pela IA gerenciada do Lovable.
+- Logomarca exata por sobreposição determinística.
 - Projetos, histórico, exclusão individual, exclusão de projeto com remoção de arquivos.
 - Admin: assinantes (bloqueio com motivo), assinaturas, pagamentos, planos (rascunho/ativo/inativo, ordenação, publicação de preço na Stripe), agentes com prompt privado versionado, identidade visual, teste, IA gerenciada, Stripe, reconciliação e auditoria.
 
@@ -43,7 +43,7 @@ Regras implementadas: acesso pago só com fatura `paid` re-consultada na Stripe;
 - Execução: cada item roda numa requisição do servidor enquanto a página aguarda. Se a aba fechar no meio, a execução pode não terminar; a rotina horária marca o item como “interrompido” e libera a reserva sem cobrança (pode haver custo de IA para o operador).
 - Prevenção de múltiplas contas: o teste é único por conta; a mesma pessoa pode criar outra conta com outro e-mail.
 - E-mails de autenticação usam o remetente padrão do Lovable Cloud; para domínio próprio configure em More → Emails.
-- Vetorização roda no navegador (imagetracerjs, domínio público), não VTracer/Potrace: fotos complexas geram muitos caminhos.
+- “Inventar imagem” e “Vetorizar” foram removidos. Operações e arquivos antigos continuam disponíveis no histórico; agentes antigos abrem a bancada Criar imagem.
 - Preservação de identidade e de logomarca pela IA não é garantida; use “Aplicar logomarca exata” para reprodução fiel.
 - Exclusão de conta é feita pelo administrador (não há botão de autoexclusão).
 

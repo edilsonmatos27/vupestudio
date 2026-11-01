@@ -16,7 +16,7 @@ BEGIN
   select * into b from public.credit_balance(uid);
   r := r || 'after_repeat_start=' || b.available || ',trials=' || (select count(*) from public.trials where user_id=uid) || ';';
   acc := public.access_state(uid); r := r || 'access=' || (acc->>'code') || ';';
-  insert into public.operations(user_id,type,model,idempotency_key,requested_count) values (uid,'invent','m','k1',3) returning id into op;
+  insert into public.operations(user_id,type,model,idempotency_key,requested_count) values (uid,'edit','m','k1',3) returning id into op;
   insert into public.operation_items(operation_id,user_id,idx) values (op,uid,0),(op,uid,1),(op,uid,2);
   perform public.reserve_operation_credits(op); perform public.reserve_operation_credits(op);
   select * into b from public.credit_balance(uid); r := r || 'after_reserve3=' || b.available || '/' || b.reserved || ';';

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, Layers, PenTool, Sparkles, Wand2 } from "lucide-react";
+import { Bot, Layers, Wand2 } from "lucide-react";
 import heroBefore from "@/assets/hero-antes.png.asset.json";
 import heroAfter from "@/assets/hero-depois.png.asset.json";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
@@ -14,16 +14,16 @@ import { FEATURES } from "@/lib/models";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vupe Studio — crie, edite e vetorize imagens com IA" },
+      { title: "Vupe Studio — crie e edite imagens com IA" },
       {
         name: "description",
         content:
-          "Estúdio de imagens com agentes de IA: invente, edite, componha produtos e logomarcas e vetorize em SVG.",
+          "Estúdio de imagens com agentes de IA: edite fotos, componha produtos e logomarcas e gere variações.",
       },
       { property: "og:title", content: "Vupe Studio — estúdio de imagens com IA" },
       {
         property: "og:description",
-        content: "Invente, edite, componha e vetorize imagens com agentes de IA.",
+        content: "Edite, componha e gere variações de imagens com agentes de IA.",
       },
     ],
   }),
@@ -32,19 +32,9 @@ export const Route = createFileRoute("/")({
 
 const FEATURE_CARDS = [
   {
-    icon: Sparkles,
-    title: "Inventar imagem",
-    text: "Descreva a ideia, escolha um agente e receba até 3 propostas.",
-  },
-  {
     icon: Wand2,
     title: "Criar e editar",
     text: "Edite fotos, combine produtos, elementos e sua logomarca numa só cena.",
-  },
-  {
-    icon: PenTool,
-    title: "Vetorizar",
-    text: "Converta logos e desenhos em SVG com caminhos reais, prontos para impressão.",
   },
   {
     icon: Bot,
@@ -86,8 +76,8 @@ function Landing() {
             </ScrollReveal>
             <ScrollReveal delay={140} className="mt-5">
               <p className="max-w-xl text-lg text-muted-foreground">
-                Invente imagens, edite fotos, monte composições com seus produtos e logomarca e
-                vetorize em SVG — com agentes de IA que já conhecem o estilo certo.
+                Edite fotos, monte composições com seus produtos e logomarca e gere variações — com
+                agentes de IA que já conhecem o estilo certo.
               </p>
             </ScrollReveal>
             <ScrollReveal delay={210} className="mt-8">
@@ -120,7 +110,7 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           {FEATURE_CARDS.map((f, index) => (
             <ScrollReveal key={f.title} delay={index * 80} className="h-full">
               <div className="interactive-card h-full rounded-3xl border bg-panel p-6 shadow-soft">

@@ -25,7 +25,6 @@ function CreatePage() {
   return (
     <Workbench
       key={`${source ?? ""}-${modo ?? ""}`}
-      mode="create"
       agentId={agente}
       sourceAssetId={source}
       initialTask={modo}

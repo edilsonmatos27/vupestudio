@@ -1,8 +1,8 @@
 # Vupe Studio — roadmap
 
 - [x] Banco, regras de teste/créditos/acesso, autenticação com plano obrigatório
-- [x] Bancadas Inventar/Criar (edição, composição, variações) com IA gerenciada
-- [x] Vetorização SVG real, logomarca exata, projetos, histórico
+- [x] Bancada Criar (edição, composição, variações) com IA gerenciada
+- [x] Logomarca exata, projetos e histórico (incluindo operações antigas)
 - [x] Admin: assinantes, assinaturas, pagamentos, planos, agentes, administração, créditos
 - [x] Stripe com chaves próprias: credenciais cifradas, checkout, portal, webhook, upgrade/downgrade, reconciliação
 - [ ] Promover o primeiro admin master — aguarda o usuário criar a conta

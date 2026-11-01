@@ -18,6 +18,6 @@
 - Stripe uses the admin's own keys stored AES-GCM-encrypted in `stripe_credentials` (key from `VUPE_SECRETS_KEY`), REST calls pinned to API version 2024-06-20; test and live data are separated by a `mode` column.
 - Image AI runs only server-side through the Lovable AI Gateway; the verified model catalog and capabilities live in `src/lib/models.ts` (shared, no secrets).
 - Agent base prompts live only in `agent_versions` (service_role only) and are referenced by `operations.agent_version_id`; never return them to subscriber flows.
-- Vectorization traces in the browser with imagetracerjs (public domain); the server authorizes the operation and stores only SVGs rebuilt by `src/lib/svg-sanitize.ts`.
+- Retired invent/vectorize operations and SVG assets remain readable in history; new operations support only edit, compose, and variation. Legacy invent-purpose agents open the current image workbench.
 - Public media (logo, favicon, agent images) is served from the private `vupe-media` bucket via `/api/public/media/$name` because public buckets are blocked in this workspace.
 - Business-rule SQL checks live in `supabase/tests/business_rules.sql` (self-rolling-back); unit tests run with `bunx vitest run`.

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Coins, FolderOpen, PenTool, Sparkles, Wand2, Image as ImageIcon } from "lucide-react";
+import { Coins, FolderOpen, Wand2, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from "@/components/states";
 import { Lightbox } from "@/components/lightbox";
@@ -118,16 +118,9 @@ function Dashboard() {
             </span>
           )}
         </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3">
           {[
-            {
-              to: "/inventar",
-              icon: Sparkles,
-              label: "Inventar imagem",
-              text: "Do zero, com descrição e agente",
-            },
             { to: "/criar", icon: Wand2, label: "Criar imagem", text: "Editar, compor e variar" },
-            { to: "/vetorizar", icon: PenTool, label: "Vetorizar", text: "Converter em SVG" },
           ].map((s) => (
             <Link
               key={s.to}

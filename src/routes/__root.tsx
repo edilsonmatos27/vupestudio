@@ -83,12 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Vupe Studio — criação e edição de imagens com IA" },
       {
         name: "description",
-        content: "Crie, edite, componha e vetorize imagens com agentes de IA no Vupe Studio.",
+        content: "Edite, componha e gere variações de imagens com agentes de IA no Vupe Studio.",
       },
       { property: "og:title", content: "Vupe Studio" },
       {
         property: "og:description",
-        content: "Crie, edite, componha e vetorize imagens com agentes de IA.",
+        content: "Edite, componha e gere variações de imagens com agentes de IA.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

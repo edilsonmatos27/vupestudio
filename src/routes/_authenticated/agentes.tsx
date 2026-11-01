@@ -154,7 +154,7 @@ function AgentGrid() {
           </div>
           <div className="flex flex-1 flex-col p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-              {a.purpose === "invent" ? "Inventar" : "Criar / editar"}
+              Criar / editar
             </p>
             <h3 className="mt-1 text-lg font-semibold">{a.name}</h3>
             <p className="mt-1 flex-1 text-sm text-muted-foreground">{a.public_description}</p>
@@ -162,7 +162,7 @@ function AgentGrid() {
               className="mt-4"
               onClick={() =>
                 navigate({
-                  to: a.purpose === "invent" ? "/inventar" : "/criar",
+                  to: "/criar",
                   search: { agente: a.id },
                 })
               }
@@ -181,7 +181,7 @@ const empty = {
   name: "",
   public_description: "",
   image_url: null as string | null,
-  purpose: "invent" as "invent" | "create",
+  purpose: "create" as const,
   base_prompt: "",
   allowed_plan_ids: [] as string[],
 };
@@ -215,7 +215,7 @@ function AdminAgents() {
         name: a.name,
         public_description: a.public_description,
         image_url: a.image_url,
-        purpose: a.purpose as "invent" | "create",
+        purpose: "create",
         base_prompt,
         allowed_plan_ids: a.allowed_plan_ids,
       });
@@ -301,7 +301,7 @@ function AdminAgents() {
                 <p className="font-semibold">
                   {a.name}{" "}
                   <span className="text-xs font-normal text-muted-foreground">
-                    v{a.current_version} · {a.purpose === "invent" ? "Inventar" : "Criar"}
+                    v{a.current_version} · Criar / editar
                   </span>
                 </p>
                 <p className="truncate text-sm text-muted-foreground">{a.public_description}</p>
@@ -339,29 +339,13 @@ function AdminAgents() {
           </DialogHeader>
           {edit && (
             <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4">
                 <div className="space-y-1.5">
                   <Label>Nome</Label>
                   <Input
                     value={edit.name}
                     onChange={(e) => setEdit({ ...edit, name: e.target.value })}
                   />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Finalidade</Label>
-                  <div className="flex gap-2">
-                    {(["invent", "create"] as const).map((p) => (
-                      <Button
-                        key={p}
-                        type="button"
-                        size="sm"
-                        variant={edit.purpose === p ? "default" : "outline"}
-                        onClick={() => setEdit({ ...edit, purpose: p })}
-                      >
-                        {p === "invent" ? "Inventar" : "Criar/editar"}
-                      </Button>
-                    ))}
-                  </div>
                 </div>
               </div>
               <div className="space-y-1.5">

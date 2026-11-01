@@ -6,7 +6,6 @@ import {
   Image as ImageIcon,
   Loader2,
   MoreHorizontal,
-  PenTool,
   Shapes,
   Sparkles,
   Stamp,
@@ -225,13 +224,6 @@ export function OperationCard({
                           }
                         >
                           <Shapes /> Variações
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            navigate({ to: "/vetorizar", search: { source: it.asset!.id } })
-                          }
-                        >
-                          <PenTool /> Vetorizar
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setOverlay(it)}>
                           <Stamp /> Aplicar logomarca exata

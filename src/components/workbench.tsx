@@ -30,15 +30,11 @@ import { errorMessage, newKey, type UploadedAsset } from "@/lib/client-api";
 import { UPLOAD_LIMITS, type Task } from "@/lib/models";
 import { useMe } from "@/hooks/use-me";
 
-type Mode = "invent" | "create";
-
 export function Workbench({
-  mode,
   agentId,
   sourceAssetId,
   initialTask,
 }: {
-  mode: Mode;
   agentId?: string | undefined;
   sourceAssetId?: string | undefined;
   initialTask?: "edit" | "compose" | "variation" | undefined;
@@ -47,7 +43,7 @@ export function Workbench({
   const { data: me } = useMe();
   const opts = useQuery({ queryKey: ["studio-options"], queryFn: () => studioOptions() });
   const agents = useQuery({ queryKey: ["my-agents"], queryFn: () => listMyAgents() });
-  const [task, setTask] = useState<Task>(mode === "invent" ? "invent" : (initialTask ?? "edit"));
+  const [task, setTask] = useState<Task>(initialTask ?? "edit");
   const [model, setModel] = useState("");
   const [agent, setAgent] = useState<string>(agentId ?? "none");
   const [instructions, setInstructions] = useState("");
@@ -106,9 +102,7 @@ export function Workbench({
     if (current && !current.transparency) setTransparent(false);
   }, [current, aspect, quality]);
 
-  const visibleAgents = (agents.data ?? []).filter(
-    (a) => a.purpose === (mode === "invent" ? "invent" : "create"),
-  );
+  const visibleAgents = agents.data ?? [];
   const maxBatch = opts.data?.maxBatch ?? 1;
   const itemCount = task === "edit" && main.length > 1 ? main.length : count;
   const cost = me?.isAdmin ? 0 : itemCount;
@@ -132,7 +126,7 @@ export function Workbench({
     try {
       const res = await createOperation({
         data: {
-          type: task as "invent" | "edit" | "compose" | "variation",
+          type: task,
           model,
           agentId: agent === "none" ? null : agent,
           instructions,
@@ -181,12 +175,8 @@ export function Workbench({
   return (
     <div>
       <PageHeader
-        title={mode === "invent" ? "Inventar imagem" : "Criar imagem"}
-        description={
-          mode === "invent"
-            ? "Gere imagens do zero a partir de uma descrição, um agente e referências opcionais."
-            : "Edite imagens existentes, gere variações ou monte composições com fotos, produtos, elementos e logomarca."
-        }
+        title="Criar imagem"
+        description="Edite imagens existentes, gere variações ou monte composições com fotos, produtos, elementos e logomarca."
       />
       {!o.access.ok && (
         <div className="mb-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
@@ -198,15 +188,13 @@ export function Workbench({
       )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
         <div className="space-y-5 rounded-3xl border bg-panel p-5 shadow-soft">
-          {mode === "create" && (
-            <Tabs value={task} onValueChange={(v) => setTask(v as Task)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="edit">Editar</TabsTrigger>
-                <TabsTrigger value="compose">Composição</TabsTrigger>
-                <TabsTrigger value="variation">Variações</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          )}
+          <Tabs value={task} onValueChange={(v) => setTask(v as Task)}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="edit">Editar</TabsTrigger>
+              <TabsTrigger value="compose">Composição</TabsTrigger>
+              <TabsTrigger value="variation">Variações</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {o.access.ok && !featureAllowed && (
             <p className="rounded-lg bg-warning/15 px-3 py-2 text-sm">
               Este recurso não está incluído no seu plano atual.
@@ -251,13 +239,11 @@ export function Workbench({
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               placeholder={
-                task === "invent"
-                  ? "Ex.: frasco de perfume âmbar sobre mármore, luz de fim de tarde, estilo editorial"
-                  : task === "edit"
-                    ? "Ex.: troque o fundo por um estúdio branco e mantenha a pessoa igual"
-                    : task === "compose"
-                      ? "Ex.: coloque o produto sobre a mesa do ambiente, com a logomarca discreta no canto"
-                      : ""
+                task === "edit"
+                  ? "Ex.: troque o fundo por um estúdio branco e mantenha a pessoa igual"
+                  : task === "compose"
+                    ? "Ex.: coloque o produto sobre a mesa do ambiente, com a logomarca discreta no canto"
+                    : ""
               }
             />
           </div>
@@ -308,16 +294,6 @@ export function Workbench({
                 transparentPreview
               />
             </>
-          )}
-          {task === "invent" && (
-            <UploadZone
-              label="Referências (opcional)"
-              hint="Imagens para orientar o conteúdo."
-              role="main"
-              max={UPLOAD_LIMITS.main}
-              value={main}
-              onChange={setMain}
-            />
           )}
           {task !== "variation" && (
             <UploadZone

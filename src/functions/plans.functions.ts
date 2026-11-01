@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { activeFeatures } from "@/lib/models";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function adminCtx(context: { supabase: any; userId: string }) {
@@ -28,7 +29,7 @@ const planSchema = z.object({
   price_cents: z.number().int().min(0).max(100000000).nullable(),
   billing_interval: z.enum(["month", "year"]),
   credits_per_cycle: z.number().int().min(0).max(1000000),
-  allowed_features: z.array(z.string()).max(10),
+  allowed_features: z.array(z.string()).max(10).transform(activeFeatures),
   allowed_models: z.array(z.string()).max(20),
   max_batch: z.number().int().min(1).max(3),
   highlight: z.boolean(),

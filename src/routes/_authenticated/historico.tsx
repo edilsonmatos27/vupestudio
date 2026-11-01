@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/historico")({
   head: () => ({
     meta: [
       { title: "Meu histórico — Vupe Studio" },
-      { name: "description", content: "Todas as suas criações, edições e vetorizações." },
+      { name: "description", content: "Todas as suas imagens e operações anteriores." },
     ],
   }),
   component: HistoryPage,
@@ -20,11 +20,11 @@ export const Route = createFileRoute("/_authenticated/historico")({
 
 const FILTERS = [
   ["all", "Tudo"],
-  ["invent", "Criação"],
+  ["invent", "Criação (histórico)"],
   ["edit", "Edição"],
   ["compose", "Composição"],
   ["variation", "Variação"],
-  ["vectorize", "Vetorização"],
+  ["vectorize", "Vetorização (histórico)"],
   ["logo_overlay", "Logomarca"],
 ] as const;
 

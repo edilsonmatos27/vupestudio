@@ -427,7 +427,7 @@ function Ai() {
         })}
       </div>
       <div className="grid gap-4 rounded-3xl border bg-card p-6 sm:grid-cols-2">
-        {(["invent", "edit", "compose", "variation"] as const).map((t) => (
+        {(["edit", "compose", "variation"] as const).map((t) => (
           <div key={t} className="space-y-1.5">
             <Label>Padrão para {FEATURES.find((f) => f.id === t)?.label}</Label>
             <Select

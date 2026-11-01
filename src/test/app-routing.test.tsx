@@ -15,3 +15,16 @@ describe("App routing", () => {
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
 });
+
+describe("retired tool routes", () => {
+  for (const path of ["/inventar", "/vetorizar"]) {
+    it(`${path} no longer resolves to a tool page`, () => {
+      const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+      expect(router.matchRoutes(path).at(-1)?.routeId).toBe(rootRouteId);
+    });
+  }
+  it("keeps the remaining workbench available", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes("/criar").at(-1)?.routeId).toBe("/_authenticated/criar");
+  });
+});

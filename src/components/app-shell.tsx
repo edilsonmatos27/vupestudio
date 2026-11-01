@@ -12,7 +12,6 @@ import {
   Menu,
   Moon,
   Palette,
-  PenTool,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -42,9 +41,7 @@ type Item = { to: string; label: string; icon: typeof Sparkles };
 
 const COMMON_TOP: Item[] = [
   { to: "/painel", label: "Visão geral", icon: LayoutDashboard },
-  { to: "/inventar", label: "Inventar imagem", icon: Sparkles },
   { to: "/criar", label: "Criar imagem", icon: Wand2 },
-  { to: "/vetorizar", label: "Vetorizar", icon: PenTool },
   { to: "/agentes", label: "Agentes de IA", icon: Bot },
   { to: "/historico", label: "Meu histórico", icon: History },
 ];

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { FEATURES, MODEL_CATALOG } from "@/lib/models";
+import { FEATURES, MODEL_CATALOG, activeFeatures } from "@/lib/models";
 
 async function adminCtx(context: { supabase: any; userId: string }) {
   const U = await import("@/lib/server-utils.server");
@@ -31,7 +31,7 @@ const trialSchema = z.object({
     .min(0)
     .max(60 * 24 * 365),
   trial_credits: z.number().int().min(0).max(100000),
-  trial_features: z.array(z.string()).max(10),
+  trial_features: z.array(z.string()).max(10).transform(activeFeatures),
   trial_models: z.array(z.string()).max(20),
 });
 
@@ -51,7 +51,15 @@ export const adminSaveTrial = createServerFn({ method: "POST" })
 
 const aiSchema = z.object({
   ai_models: z.record(z.object({ enabled: z.boolean() })),
-  ai_defaults: z.record(z.string()),
+  ai_defaults: z
+    .record(z.string())
+    .transform((defaults) =>
+      Object.fromEntries(
+        Object.entries(defaults).filter(([task]) =>
+          FEATURES.some((feature) => feature.id === task),
+        ),
+      ),
+    ),
 });
 
 export const adminSaveAi = createServerFn({ method: "POST" })

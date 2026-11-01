@@ -303,7 +303,7 @@ function CreditsPage() {
     <div>
       <PageHeader
         title="Créditos disponíveis"
-        description="Cada imagem gerada, editada ou variada com sucesso consome 1 crédito. Vetorização não consome créditos."
+        description="Cada imagem gerada, editada ou variada com sucesso consome 1 crédito."
       />
       {!me ? (
         <LoadingState />

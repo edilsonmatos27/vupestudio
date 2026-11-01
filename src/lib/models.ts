@@ -2,8 +2,8 @@
 // Capabilities were checked against the authenticated model listing (/v1/models) and the
 // documented request contracts. Only safe metadata lives here (shared with the browser).
 
-export type Task = "invent" | "edit" | "compose" | "variation";
-export type Feature = Task | "vectorize";
+export type Task = "edit" | "compose" | "variation";
+export type Feature = Task;
 export type RequestFormat = "openai" | "gemini-chat" | "generate-content";
 
 export interface ModelInfo {
@@ -21,13 +21,17 @@ export interface ModelInfo {
 }
 
 export const FEATURES: { id: Feature; label: string }[] = [
-  { id: "invent", label: "Inventar imagem" },
   { id: "edit", label: "Editar imagem" },
   { id: "compose", label: "Composição" },
   { id: "variation", label: "Variações" },
-  { id: "vectorize", label: "Vetorização" },
 ];
 
+/** Remove retired capabilities from legacy plan/trial settings when saving. */
+export function activeFeatures(features: readonly string[]): Feature[] {
+  return features.filter((id): id is Feature => FEATURES.some((feature) => feature.id === id));
+}
+
+// Includes retired operation labels solely for reading existing history.
 export const TASK_LABEL: Record<string, string> = {
   invent: "Criação",
   edit: "Edição",
@@ -37,7 +41,7 @@ export const TASK_LABEL: Record<string, string> = {
   logo_overlay: "Logomarca aplicada",
 };
 
-const ALL_TASKS: Task[] = ["invent", "edit", "compose", "variation"];
+const ALL_TASKS: Task[] = ["edit", "compose", "variation"];
 
 export const MODEL_CATALOG: ModelInfo[] = [
   {

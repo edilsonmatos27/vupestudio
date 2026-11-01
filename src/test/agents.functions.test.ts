@@ -5,12 +5,14 @@ const mock = vi.hoisted(() => ({
   assertAdmin: vi.fn(),
   audit: vi.fn(),
   getAccess: vi.fn(),
+  getSettings: vi.fn(),
 }));
 vi.mock("@/lib/server-utils.server", () => ({
   supabaseAdmin: { from: mock.from },
   assertAdmin: mock.assertAdmin,
   audit: mock.audit,
   getAccess: mock.getAccess,
+  getSettings: mock.getSettings,
 }));
 vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
 // Invoke the actual handlers and Zod validators without an HTTP server or credentials.
@@ -115,7 +117,7 @@ describe("admin agent ordering", () => {
       name: "Teste",
       public_description: "",
       image_url: null,
-      purpose: "invent",
+      purpose: "create",
       base_prompt: "prompt",
       allowed_plan_ids: [],
       settings: {},
@@ -135,5 +137,27 @@ describe("admin agent ordering", () => {
       expect.objectContaining({ id: "c" }),
       expect.objectContaining({ id: "a" }),
     ]);
+  });
+});
+
+describe("retired studio tools", () => {
+  it("rejects new invent operations before accessing the database", async () => {
+    const { createOperation } = await import("@/functions/studio.functions");
+    await expect(
+      call(createOperation, { type: "invent", model: "model", idempotencyKey: id }),
+    ).rejects.toThrow();
+    expect(mock.from).not.toHaveBeenCalled();
+  });
+  it("does not expose retired capabilities to administrators", async () => {
+    const { studioOptions } = await import("@/functions/studio.functions");
+    mock.getAccess.mockResolvedValue({
+      code: "admin",
+      ok: true,
+      features: ["invent", "vectorize", "edit"],
+    });
+    mock.getSettings.mockResolvedValue({ ai_models: {}, ai_defaults: {} });
+    mock.from.mockReturnValue(query([]));
+    const result = (await call(studioOptions)) as { features: string[] };
+    expect(result.features).toEqual(["edit", "compose", "variation"]);
   });
 });
