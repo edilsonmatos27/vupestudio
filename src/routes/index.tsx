@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, Layers, Wand2 } from "lucide-react";
+import { Bot, Box, ImagePlus, Layers, RotateCcw, Wand2 } from "lucide-react";
 import heroBefore from "@/assets/hero-antes.png.asset.json";
 import heroAfter from "@/assets/hero-depois.png.asset.json";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
@@ -32,9 +32,24 @@ export const Route = createFileRoute("/")({
 
 const FEATURE_CARDS = [
   {
+    icon: ImagePlus,
+    title: "Criar",
+    text: "Monte artes combinando seus produtos, elementos e logomarca numa só cena.",
+  },
+  {
     icon: Wand2,
-    title: "Criar e editar",
-    text: "Edite fotos, combine produtos, elementos e sua logomarca numa só cena.",
+    title: "Editar",
+    text: "Transforme fotos, troque fundos e ajuste detalhes com inteligência artificial.",
+  },
+  {
+    icon: RotateCcw,
+    title: "Restaurar",
+    text: "Recupere fotos antigas, melhore a nitidez e renove suas lembranças.",
+  },
+  {
+    icon: Box,
+    title: "Renderizar",
+    text: "Dê mais realismo aos seus projetos com iluminação, materiais e texturas.",
   },
   {
     icon: Bot,
@@ -110,7 +125,7 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {FEATURE_CARDS.map((f, index) => (
             <ScrollReveal key={f.title} delay={index * 80} className="h-full">
               <div className="interactive-card h-full rounded-3xl border bg-panel p-6 shadow-soft">
