@@ -1,0 +1,67 @@
+.featured-plan-beam {
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  padding: 2px;
+  pointer-events: none;
+  /* Clip the light to the outline without clipping card content or focus rings. */
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.featured-plan-beam > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  offset-path: inset(0 round 24px);
+  offset-anchor: 50% 50%;
+  animation: featured-plan-beam-orbit 6s linear infinite;
+}
+
+.featured-plan-beam > span + span {
+  animation-delay: -3s;
+}
+
+@keyframes featured-plan-beam-orbit {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .featured-plan-beam > span {
+    width: 220px;
+    height: 220px;
+    animation-duration: 8s;
+  }
+
+  .featured-plan-beam > span + span {
+    animation-delay: -4s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-plan-beam {
+    display: none;
+  }
+
+  .featured-plan-beam > span {
+    animation: none;
+  }
+}
+
+@supports not (offset-path: inset(0 round 24px)) {
+  .featured-plan-beam {
+    display: none;
+  }
+}

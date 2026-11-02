@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/states";
 import { Button } from "@/components/ui/button";
+import { FeaturedPlanBeam } from "@/components/featured-plan-beam";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -253,8 +254,9 @@ function PlansPage() {
           return (
             <div
               key={p.id}
-              className={`flex flex-col rounded-3xl border bg-card p-6 shadow-soft ${p.highlight ? "ring-2 ring-primary" : ""}`}
+              className={`relative flex flex-col rounded-3xl border bg-card p-6 shadow-soft ${p.highlight ? "border-primary/30 ring-1 ring-primary/20" : ""}`}
             >
+              {p.highlight && <FeaturedPlanBeam />}
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">{p.name}</h3>
                 {isCurrent && <StatusBadge status="active" />}

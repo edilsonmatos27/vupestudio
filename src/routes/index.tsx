@@ -4,6 +4,7 @@ import { Bot, Box, ImagePlus, Layers, RotateCcw, Wand2 } from "lucide-react";
 import heroBefore from "@/assets/hero-antes.png.asset.json";
 import heroAfter from "@/assets/hero-depois.png.asset.json";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
+import { FeaturedPlanBeam } from "@/components/featured-plan-beam";
 import { useRef } from "react";
 import { HomeReveal } from "@/components/home/home-reveal";
 import { HomeShowcase } from "@/components/home/home-showcase";
@@ -175,8 +176,9 @@ function Landing() {
             <HomeReveal key={p.id} className="h-full">
               <div
                 data-home-tilt
-                className={`interactive-card flex h-full flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
+                className={`interactive-card relative flex h-full flex-col rounded-3xl p-6 ${p.highlight ? "panel-featured" : "border bg-panel shadow-soft"}`}
               >
+                {p.highlight && <FeaturedPlanBeam />}
                 {p.highlight && (
                   <span className="mb-3 self-start rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                     Destaque
