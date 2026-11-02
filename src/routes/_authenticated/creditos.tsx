@@ -44,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/creditos")({
 const SOURCE: Record<string, string> = {
   trial: "Teste",
   subscription: "Assinatura",
+  prepaid: "Compra avulsa",
   upgrade: "Upgrade",
   manual: "Manual",
 };

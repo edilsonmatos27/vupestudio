@@ -1,3 +1,4 @@
+import { planPeriodLabel } from "@/lib/plan-billing";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -101,7 +102,7 @@ function CheckoutReturn({ sessionId }: { sessionId: string }) {
       )}
       {state === "paid" && (
         <p className="flex items-center gap-2 text-sm text-success">
-          <CheckCircle2 className="size-4" /> Pagamento confirmado. Sua assinatura está ativa.
+          <CheckCircle2 className="size-4" /> Pagamento confirmado. Seu acesso está liberado.
         </p>
       )}
       {state === "pending" && (
@@ -141,6 +142,7 @@ function PlansPage() {
   if (plans.error)
     return <ErrorState message={errorMessage(plans.error)} onRetry={() => plans.refetch()} />;
   const sub = me?.subscription;
+  const prepaidActive = me?.access.code === "paid" && me.access.billing_type === "one_time";
   const hasPaidSub =
     sub && ["active", "past_due", "trialing", "incomplete", "unpaid"].includes(sub.stripe_status);
 
@@ -235,14 +237,16 @@ function PlansPage() {
           </div>
           <div className="rounded-3xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">
-              {sub?.cancel_at_period_end ? "Acesso até" : "Próxima renovação"}
+              {prepaidActive || sub?.cancel_at_period_end ? "Acesso até" : "Próxima renovação"}
             </p>
             <p className="mt-1 font-display text-xl font-bold">
-              {sub?.current_period_end
-                ? formatDate(sub.current_period_end, false)
-                : me.access.code === "trial"
-                  ? `Teste até ${formatDate(me.access.trial_ends_at, false)}`
-                  : "—"}
+              {prepaidActive && me?.access.paid_through
+                ? formatDate(me.access.paid_through, false)
+                : sub?.current_period_end
+                  ? formatDate(sub.current_period_end, false)
+                  : me.access.code === "trial"
+                    ? `Teste até ${formatDate(me.access.trial_ends_at, false)}`
+                    : "—"}
             </p>
           </div>
         </div>
@@ -262,16 +266,26 @@ function PlansPage() {
                 {isCurrent && <StatusBadge status="active" />}
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+              <p className="mt-2 text-xs text-primary">
+                {p.billing_type === "one_time"
+                  ? "Pagamento avulso · sem renovação automática"
+                  : "Assinatura · renovação automática"}
+              </p>
               <p className="mt-4 font-display text-3xl font-bold">
                 {formatBRL(p.price_cents)}
                 {p.price_cents !== null && (
-                  <span className="text-base font-medium text-muted-foreground">
-                    /{p.billing_interval === "month" ? "mês" : "ano"}
+                  <span
+                    className={`text-base font-medium text-muted-foreground ${p.billing_type === "one_time" ? "ml-1" : ""}`}
+                  >
+                    {planPeriodLabel(p)}
                   </span>
                 )}
               </p>
               <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                <li>{p.credits_per_cycle} créditos por ciclo</li>
+                <li>
+                  {p.credits_per_cycle} créditos{" "}
+                  {p.billing_type === "one_time" ? "por compra" : "por ciclo"}
+                </li>
                 <li>Até {p.max_batch} resultado(s) por operação</li>
                 {FEATURES.map((f) => (
                   <li
@@ -292,10 +306,19 @@ function PlansPage() {
                 <Button className="mt-6" variant="outline" disabled>
                   Pagamento ainda não disponível
                 </Button>
+              ) : prepaidActive ? (
+                <Button className="mt-6" variant="outline" disabled>
+                  Período avulso ativo
+                </Button>
               ) : isCurrent ? (
                 <Button className="mt-6" variant="outline" disabled>
                   Plano atual
                 </Button>
+              ) : hasPaidSub && p.billing_type === "one_time" ? (
+                <p className="mt-6 text-xs text-muted-foreground">
+                  Para comprar avulso, cancele a renovação da assinatura e aguarde o período atual
+                  terminar.
+                </p>
               ) : hasPaidSub ? (
                 <Button
                   className="mt-6"
@@ -312,7 +335,8 @@ function PlansPage() {
                   onClick={() => subscribe(p.id)}
                   disabled={busy === p.id}
                 >
-                  {busy === p.id && <Loader2 className="animate-spin" />} Assinar
+                  {busy === p.id && <Loader2 className="animate-spin" />}{" "}
+                  {p.billing_type === "one_time" ? "Comprar período" : "Assinar"}
                 </Button>
               )}
             </div>

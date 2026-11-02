@@ -61,6 +61,7 @@ export type Access = {
   max_batch?: number;
   trial_ends_at?: string;
   paid_through?: string;
+  billing_type?: "recurring" | "one_time";
   reason?: string;
   mode?: string;
 };

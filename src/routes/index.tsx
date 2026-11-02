@@ -1,3 +1,4 @@
+import { planPeriodLabel } from "@/lib/plan-billing";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Box, ImagePlus, Layers, RotateCcw, Wand2 } from "lucide-react";
@@ -186,16 +187,26 @@ function Landing() {
                 )}
                 <h3 className="text-xl font-semibold">{p.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+                <p className="mt-2 text-xs text-primary">
+                  {p.billing_type === "one_time"
+                    ? "Pagamento avulso · sem renovação automática"
+                    : "Assinatura · renovação automática"}
+                </p>
                 <p className="mt-4 font-display text-3xl font-bold">
                   {formatBRL(p.price_cents)}
                   {p.price_cents !== null && (
-                    <span className="text-base font-medium text-muted-foreground">
-                      /{p.billing_interval === "month" ? "mês" : "ano"}
+                    <span
+                      className={`text-base font-medium text-muted-foreground ${p.billing_type === "one_time" ? "ml-1" : ""}`}
+                    >
+                      {planPeriodLabel(p)}
                     </span>
                   )}
                 </p>
                 <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                  <li>{p.credits_per_cycle} créditos por ciclo</li>
+                  <li>
+                    {p.credits_per_cycle} créditos{" "}
+                    {p.billing_type === "one_time" ? "por compra" : "por ciclo"}
+                  </li>
                   <li>Até {p.max_batch} resultado(s) por operação</li>
                   {FEATURES.filter((f) => p.allowed_features.includes(f.id)).map((f) => (
                     <li key={f.id}>{f.label}</li>

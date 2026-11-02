@@ -563,6 +563,7 @@ export type Database = {
         Row: {
           active: boolean
           amount_cents: number
+          billing_type: string
           billing_interval: string
           created_at: string
           currency: string
@@ -575,6 +576,7 @@ export type Database = {
         Insert: {
           active?: boolean
           amount_cents: number
+          billing_type?: string
           billing_interval: string
           created_at?: string
           currency: string
@@ -587,6 +589,7 @@ export type Database = {
         Update: {
           active?: boolean
           amount_cents?: number
+          billing_type?: string
           billing_interval?: string
           created_at?: string
           currency?: string
@@ -606,10 +609,57 @@ export type Database = {
           },
         ]
       }
+      prepaid_purchases: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          mode: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          stripe_session_id: string | null
+          stripe_invoice_id: string | null
+          amount_cents: number
+          currency: string
+          billing_interval: string
+          credits: number
+          features: string[]
+          models: string[]
+          max_batch: number
+          status: string
+          paid_at: string | null
+          paid_through: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          plan_id: string
+          mode: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          amount_cents: number
+          currency: string
+          billing_interval: string
+          credits: number
+          features: string[]
+          models: string[]
+          max_batch: number
+          id?: string
+          stripe_session_id?: string | null
+          stripe_invoice_id?: string | null
+          status?: string
+          paid_at?: string | null
+          paid_through?: string | null
+          created_at?: string
+        }
+        Update: { stripe_session_id?: string | null; status?: string }
+        Relationships: []
+      }
       plans: {
         Row: {
           allowed_features: string[]
           allowed_models: string[]
+          billing_type: string
           billing_interval: string
           created_at: string
           credits_per_cycle: number
@@ -632,6 +682,7 @@ export type Database = {
         Insert: {
           allowed_features?: string[]
           allowed_models?: string[]
+          billing_type?: string
           billing_interval?: string
           created_at?: string
           credits_per_cycle?: number
@@ -654,6 +705,7 @@ export type Database = {
         Update: {
           allowed_features?: string[]
           allowed_models?: string[]
+          billing_type?: string
           billing_interval?: string
           created_at?: string
           credits_per_cycle?: number
@@ -965,6 +1017,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_prepaid_invoice: { Args: { _purchase: string; _invoice: string }; Returns: string }
+      revoke_prepaid_invoice: { Args: { _invoice: string; _reason: string; _purchase?: string }; Returns: string }
       _lock_user: { Args: { _uid: string }; Returns: undefined }
       access_state: { Args: { _uid: string }; Returns: Json }
       admin_adjust_credits: {

@@ -91,7 +91,7 @@ function Dashboard() {
     : me?.access.code === "trial"
       ? `Em teste · restam ${cd?.label ?? "…"}`
       : me?.access.code === "paid"
-        ? `Assinatura ativa até ${formatDate(me.access.paid_through, false)}`
+        ? `${me.access.billing_type === "one_time" ? "Acesso avulso" : "Assinatura ativa"} até ${formatDate(me.access.paid_through, false)}`
         : me?.access.code === "trial_expired"
           ? "Teste encerrado"
           : me?.access.code === "blocked"

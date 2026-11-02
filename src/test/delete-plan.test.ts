@@ -125,15 +125,20 @@ describe("admin plan deletion", () => {
     },
   );
 
-  it.each(["profiles", "trials", "subscriptions", "invoices", "agents", "plan_prices"])(
-    "preserves plans referenced by %s (including historical prices)",
-    async (table) => {
-      linkTable = table;
-      await expect(run()).rejects.toThrow("vinculados ou preços");
-      expect(deletion).not.toHaveBeenCalled();
-      expect(mocks.audit).not.toHaveBeenCalled();
-    },
-  );
+  it.each([
+    "profiles",
+    "trials",
+    "subscriptions",
+    "invoices",
+    "agents",
+    "plan_prices",
+    "prepaid_purchases",
+  ])("preserves plans referenced by %s (including historical prices)", async (table) => {
+    linkTable = table;
+    await expect(run()).rejects.toThrow("vinculados ou preços");
+    expect(deletion).not.toHaveBeenCalled();
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
 
   it("fails closed when a reference lookup fails", async () => {
     failedTable = "subscriptions";

@@ -60,7 +60,7 @@ export function AccessBanner() {
             <p className="font-semibold">
               {code === "trial_expired"
                 ? TRIAL_EXPIRED_MESSAGE
-                : "Você não possui teste válido nem assinatura paga vigente."}
+                : "Você não possui teste válido nem período pago vigente."}
             </p>
             <p className="mt-1 text-muted-foreground">
               Plano escolhido: <b>{me.plan?.name ?? "—"}</b>

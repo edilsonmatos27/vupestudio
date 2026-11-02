@@ -1,3 +1,4 @@
+import { planPeriodLabel } from "@/lib/plan-billing";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -142,9 +143,18 @@ function Signup() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   {formatBRL(p.price_cents)}
                   {p.price_cents !== null && (
-                    <>/{p.billing_interval === "month" ? "mês" : "ano"}</>
+                    <>
+                      {p.billing_type === "one_time" && " "}
+                      {planPeriodLabel(p)}
+                    </>
                   )}{" "}
-                  · {p.credits_per_cycle} créditos/ciclo
+                  · {p.credits_per_cycle} créditos{" "}
+                  {p.billing_type === "one_time" ? "por compra" : "por ciclo"}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {p.billing_type === "one_time"
+                    ? "Avulso · sem renovação automática"
+                    : "Assinatura · renovação automática"}
                 </p>
               </button>
             ))}

@@ -27,6 +27,7 @@ const planSchema = z.object({
   name: z.string().trim().min(1).max(80),
   description: z.string().max(600),
   price_cents: z.number().int().min(0).max(100000000).nullable(),
+  billing_type: z.enum(["recurring", "one_time"]).default("recurring"),
   billing_interval: z.enum(["month", "year"]),
   credits_per_cycle: z.number().int().min(0).max(1000000),
   allowed_features: z.array(z.string()).max(10).transform(activeFeatures),
@@ -53,7 +54,8 @@ export const adminSavePlan = createServerFn({ method: "POST" })
       if (!prev) throw new Error("Plano não encontrado.");
       const priceChanged =
         prev.price_cents !== fields.price_cents ||
-        prev.billing_interval !== fields.billing_interval;
+        prev.billing_interval !== fields.billing_interval ||
+        prev.billing_type !== fields.billing_type;
       const patch: Record<string, unknown> = { ...fields };
       // Changing price/interval detaches current Stripe prices; existing contracts keep their old price.
       if (priceChanged) {
@@ -163,6 +165,7 @@ export const adminDeletePlan = createServerFn({ method: "POST" })
       db.from("agents").select("id").contains("allowed_plan_ids", [data.id]).limit(1),
       // Old Stripe prices remain relevant even after the plan's price changes.
       db.from("plan_prices").select("id").eq("plan_id", data.id).limit(1),
+      db.from("prepaid_purchases").select("id").eq("plan_id", data.id).limit(1),
     ]);
     if (links.some((link) => link.error))
       throw new Error("Não foi possível verificar os vínculos do plano. Tente novamente.");
@@ -233,6 +236,7 @@ export const adminSyncPlanStripe = createServerFn({ method: "POST" })
       .eq("mode", mode)
       .eq("amount_cents", plan.price_cents)
       .eq("billing_interval", plan.billing_interval)
+      .eq("billing_type", plan.billing_type)
       .eq("active", true)
       .maybeSingle();
     let priceId = existing?.stripe_price_id;
@@ -241,7 +245,8 @@ export const adminSyncPlanStripe = createServerFn({ method: "POST" })
         product: productId,
         currency: "brl",
         unit_amount: plan.price_cents,
-        recurring: { interval: plan.billing_interval },
+        recurring:
+          plan.billing_type === "one_time" ? undefined : { interval: plan.billing_interval },
         metadata: { vupe_plan_id: plan.id },
       });
       priceId = price.id as string;
@@ -253,6 +258,7 @@ export const adminSyncPlanStripe = createServerFn({ method: "POST" })
         amount_cents: plan.price_cents,
         currency: "brl",
         billing_interval: plan.billing_interval,
+        billing_type: plan.billing_type,
       });
     }
     await U.supabaseAdmin

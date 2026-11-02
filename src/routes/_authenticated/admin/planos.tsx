@@ -43,6 +43,7 @@ import {
   adminSyncPlanStripe,
 } from "@/functions/plans.functions";
 import { errorMessage, formatBRL } from "@/lib/client-api";
+import { planPeriodLabel } from "@/lib/plan-billing";
 import { FEATURES, MODEL_CATALOG } from "@/lib/models";
 
 export const Route = createFileRoute("/_authenticated/admin/planos")({
@@ -60,6 +61,7 @@ type Form = {
   name: string;
   description: string;
   price: string;
+  billing_type: "recurring" | "one_time";
   billing_interval: "month" | "year";
   credits_per_cycle: string;
   allowed_features: string[];
@@ -76,6 +78,7 @@ const blank: Form = {
   name: "",
   description: "",
   price: "",
+  billing_type: "recurring",
   billing_interval: "month",
   credits_per_cycle: "50",
   allowed_features: FEATURES.map((f) => f.id),
@@ -107,6 +110,7 @@ function AdminPlans() {
       name: p.name,
       description: p.description,
       price: p.price_cents === null ? "" : (p.price_cents / 100).toFixed(2).replace(".", ","),
+      billing_type: p.billing_type ?? "recurring",
       billing_interval: p.billing_interval,
       credits_per_cycle: String(p.credits_per_cycle),
       allowed_features: p.allowed_features,
@@ -151,6 +155,7 @@ function AdminPlans() {
           name: form.name,
           description: form.description,
           price_cents: price,
+          billing_type: form.billing_type,
           billing_interval: form.billing_interval,
           credits_per_cycle: Number(form.credits_per_cycle) || 0,
           allowed_features: form.allowed_features,
@@ -168,7 +173,7 @@ function AdminPlans() {
       });
       toast.success(
         r.priceChanged
-          ? "Plano salvo. O preço mudou: publique um novo preço na Stripe (contratos atuais mantêm o preço antigo)."
+          ? "Plano salvo. O preço ou tipo de cobrança mudou: publique um novo preço na Stripe (contratos atuais mantêm o preço antigo)."
           : "Plano salvo.",
       );
       setForm(null);
@@ -281,8 +286,11 @@ function AdminPlans() {
                     {p.highlight && <span className="text-xs text-primary">· destaque</span>}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatBRL(p.price_cents)}/{p.billing_interval === "month" ? "mês" : "ano"} ·{" "}
-                    {p.credits_per_cycle} créditos · lote até {p.max_batch}
+                    {formatBRL(p.price_cents)} {planPeriodLabel(p)} ·{" "}
+                    {p.billing_type === "one_time"
+                      ? "Avulso, sem renovação automática"
+                      : "Assinatura recorrente"}{" "}
+                    · {p.credits_per_cycle} créditos · lote até {p.max_batch}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Stripe ({q.data.mode === "test" ? "teste" : "produção"}):{" "}
@@ -401,8 +409,33 @@ function AdminPlans() {
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                 />
               </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Tipo de cobrança</Label>
+                <Select
+                  value={form.billing_type}
+                  onValueChange={(v) =>
+                    setForm({ ...form, billing_type: v as Form["billing_type"] })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recurring">Assinatura recorrente</SelectItem>
+                    <SelectItem value="one_time">Pagamento avulso</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Avulso: uma compra libera o período e os créditos, sem renovação automática. Os
+                  meios de pagamento disponíveis dependem da habilitação e elegibilidade na Stripe.
+                  Alterar o tipo exige publicar um novo preço; assinaturas existentes continuam com
+                  o contrato anterior.
+                </p>
+              </div>
               <div className="space-y-1.5">
-                <Label>Intervalo</Label>
+                <Label>
+                  {form.billing_type === "one_time" ? "Validade do acesso" : "Intervalo"}
+                </Label>
                 <Select
                   value={form.billing_interval}
                   onValueChange={(v) =>
@@ -419,7 +452,9 @@ function AdminPlans() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Créditos por ciclo</Label>
+                <Label>
+                  {form.billing_type === "one_time" ? "Créditos por compra" : "Créditos por ciclo"}
+                </Label>
                 <Input
                   inputMode="numeric"
                   value={form.credits_per_cycle}

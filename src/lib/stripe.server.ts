@@ -1,3 +1,4 @@
+import { validatePrepaidPayment } from "./plan-billing";
 // Server-only Stripe integration using the REST API with the admin's own credentials.
 // Credentials are stored encrypted (AES-GCM) in the database; they never reach the browser.
 import { decryptSecret, hmacSha256Hex, safeEqual } from "./crypto.server";
@@ -118,6 +119,7 @@ async function planForPrice(priceId: string | null | undefined, mode: StripeMode
     .from("plan_prices")
     .select("plan_id")
     .eq("stripe_price_id", priceId)
+    .eq("mode", mode)
     .maybeSingle();
   const planId = pp?.plan_id;
   if (planId) {
@@ -197,7 +199,10 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
     expand: ["charge"],
   });
   const subscriptionId: string | null = inv.subscription ?? null;
-  const userId = await userForCustomer(inv.customer, inv.subscription_details?.metadata?.user_id);
+  const userId = await userForCustomer(
+    inv.customer,
+    inv.subscription_details?.metadata?.user_id ?? inv.metadata?.user_id,
+  );
   const lines: any[] = inv.lines?.data ?? [];
   const positive = lines.filter((l) => (l.amount ?? 0) > 0);
   const main = positive[positive.length - 1] ?? lines[0];
@@ -211,7 +216,7 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
   );
   const charge = typeof inv.charge === "object" ? inv.charge : null;
 
-  await supabaseAdmin.from("invoices").upsert(
+  const { error: invoiceError } = await supabaseAdmin.from("invoices").upsert(
     {
       stripe_invoice_id: inv.id,
       user_id: userId,
@@ -226,8 +231,12 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
       currency: inv.currency ?? "brl",
       status: inv.status,
       billing_reason: inv.billing_reason ?? null,
-      period_start: Number.isFinite(periodStart) ? ts(periodStart) : null,
-      period_end: periodEnd ? ts(periodEnd) : null,
+      ...(inv.metadata?.purchase_id
+        ? {}
+        : {
+            period_start: Number.isFinite(periodStart) ? ts(periodStart) : null,
+            period_end: periodEnd ? ts(periodEnd) : null,
+          }),
       paid_at: ts(inv.status_transitions?.paid_at),
       disputed: !!charge?.disputed,
       hosted_invoice_url: inv.hosted_invoice_url ?? null,
@@ -235,6 +244,12 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
     { onConflict: "stripe_invoice_id" },
   );
 
+  if (invoiceError) throw new AppError("db", "Falha ao registrar fatura.", 500);
+
+  if (!subscriptionId && inv.metadata?.purchase_id) {
+    await fulfillPrepaidInvoice(mode, secretKey, inv);
+    return;
+  }
   if (!subscriptionId || !userId) return;
   let synced = await syncSubscription(mode, secretKey, subscriptionId);
   if (!synced) return;
@@ -265,6 +280,81 @@ export async function syncInvoice(mode: StripeMode, secretKey: string, invoiceId
   }
 }
 
+/** A paid one-time session still needs a re-fetched PAID invoice before access is granted. */
+export async function syncOneTimeCheckout(mode: StripeMode, secretKey: string, sessionId: string) {
+  const session = await stripeRequest(
+    secretKey,
+    "GET",
+    `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+  );
+  if (session.mode !== "payment" || session.payment_status !== "paid") return;
+  const invoiceId = typeof session.invoice === "string" ? session.invoice : session.invoice?.id;
+  if (!invoiceId) throw new Error("Aguardando a emissão da fatura do pagamento avulso.");
+  await syncInvoice(mode, secretKey, invoiceId);
+}
+
+async function fulfillPrepaidInvoice(mode: StripeMode, secretKey: string, invoice: any) {
+  if (invoice.status !== "paid") return;
+  const { data: purchase, error } = await supabaseAdmin
+    .from("prepaid_purchases")
+    .select("*")
+    .eq("id", invoice.metadata.purchase_id)
+    .eq("mode", mode)
+    .single();
+  if (error || !purchase?.stripe_session_id) throw new Error("Compra avulsa não encontrada.");
+  const session = await stripeRequest(
+    secretKey,
+    "GET",
+    `/v1/checkout/sessions/${encodeURIComponent(purchase.stripe_session_id)}`,
+    {
+      expand: ["line_items", "payment_intent.latest_charge"],
+    },
+  );
+  const reversal = validatePrepaidPayment(purchase, session, invoice, mode);
+  const { error: reversalRecordError } = await supabaseAdmin
+    .from("invoices")
+    .update({
+      amount_refunded: reversal.amountRefunded,
+      disputed: !!session.payment_intent.latest_charge.disputed,
+    })
+    .eq("stripe_invoice_id", invoice.id);
+  if (reversalRecordError) throw new Error("Falha ao registrar a situação do pagamento.");
+  // A replay after a refund must never restore a paid period or spent credits.
+  if (reversal.reversed) {
+    const { error } = await supabaseAdmin.rpc("revoke_prepaid_invoice", {
+      _invoice: invoice.id,
+      _reason: "Estorno ou disputa do pagamento avulso",
+      _purchase: purchase.id,
+    });
+    if (error) throw new Error("Falha ao revogar compra avulsa.");
+    if (purchase.status !== "revoked")
+      await audit({
+        actor_id: null,
+        action: "prepaid_payment_reversed",
+        target_type: "invoice",
+        target_id: invoice.id,
+        details: { purchase_id: purchase.id, mode },
+      });
+    return;
+  }
+  const { data: grantResult, error: grantError } = await supabaseAdmin.rpc(
+    "apply_prepaid_invoice",
+    {
+      _purchase: purchase.id,
+      _invoice: invoice.id,
+    },
+  );
+  if (grantError) throw new Error("Falha ao liberar o período avulso.");
+  if (grantResult === "granted")
+    await audit({
+      actor_id: null,
+      action: "prepaid_payment_applied",
+      target_type: "invoice",
+      target_id: invoice.id,
+      details: { purchase_id: purchase.id, mode },
+    });
+}
+
 /**
  * Explicit refund/dispute rule: a full refund or an opened dispute on a subscription invoice
  * revokes the remaining paid period (access_state = blocked_billing) and expires the unreserved
@@ -277,23 +367,53 @@ export async function applyChargeReversal(
   reason: string,
 ) {
   const charge = await stripeRequest(secretKey, "GET", `/v1/charges/${chargeId}`);
-  if (!charge.invoice) return;
-  await syncInvoice(mode, secretKey, charge.invoice);
+  let invoiceId = typeof charge.invoice === "string" ? charge.invoice : charge.invoice?.id;
+  if (!invoiceId && charge.payment_intent) {
+    const intent = await stripeRequest(
+      secretKey,
+      "GET",
+      `/v1/payment_intents/${typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent.id}`,
+    );
+    if (intent.metadata?.purchase_id) {
+      const { data: purchase } = await supabaseAdmin
+        .from("prepaid_purchases")
+        .select("stripe_invoice_id, stripe_session_id")
+        .eq("id", intent.metadata.purchase_id)
+        .eq("mode", mode)
+        .maybeSingle();
+      invoiceId = purchase?.stripe_invoice_id;
+      if (!invoiceId && purchase?.stripe_session_id) {
+        const session = await stripeRequest(
+          secretKey,
+          "GET",
+          `/v1/checkout/sessions/${purchase.stripe_session_id}`,
+        );
+        invoiceId = typeof session.invoice === "string" ? session.invoice : session.invoice?.id;
+      }
+    }
+  }
+  if (!invoiceId) return;
+  await syncInvoice(mode, secretKey, invoiceId);
   const full = charge.refunded || charge.disputed;
   if (!full) {
     await audit({
       actor_id: null,
       action: "stripe_partial_refund",
       target_type: "invoice",
-      target_id: charge.invoice,
+      target_id: invoiceId,
       reason,
     });
     return;
   }
+  const { error: revokeError } = await supabaseAdmin.rpc("revoke_prepaid_invoice", {
+    _invoice: invoiceId,
+    _reason: reason,
+  });
+  if (revokeError) throw new Error("Falha ao revogar pagamento avulso.");
   const { data: inv } = await supabaseAdmin
     .from("invoices")
     .select("stripe_subscription_id, user_id")
-    .eq("stripe_invoice_id", charge.invoice)
+    .eq("stripe_invoice_id", invoiceId)
     .maybeSingle();
   if (!inv?.stripe_subscription_id || !inv.user_id) return;
   await supabaseAdmin
@@ -309,7 +429,7 @@ export async function applyChargeReversal(
     actor_id: null,
     action: "stripe_reversal_applied",
     target_type: "invoice",
-    target_id: charge.invoice,
+    target_id: invoiceId,
     reason,
   });
 }
@@ -328,6 +448,7 @@ export async function processStripeEvent(mode: StripeMode, secretKey: string, ev
             { onConflict: "stripe_customer_id" },
           );
       }
+      if (obj.mode === "payment" && obj.id) await syncOneTimeCheckout(mode, secretKey, obj.id);
       if (obj.subscription) {
         const s = await syncSubscription(mode, secretKey, obj.subscription);
         const latest = s?.stripe?.latest_invoice;

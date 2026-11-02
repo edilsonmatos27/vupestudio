@@ -76,20 +76,63 @@ export const createCheckout = createServerFn({ method: "POST" })
     if (!priceId) throw new Error("Este plano ainda não tem preço configurado na Stripe.");
     const existing = await activeSub(U, context.userId, mode);
     if (existing) throw new Error("Você já possui uma assinatura. Use a opção de mudar de plano.");
+    const access = await U.getAccess(context.userId);
+    if (access.code === "paid" && access.billing_type === "one_time")
+      throw new Error(
+        "Você já possui um período avulso ativo. Aguarde o término para comprar novamente.",
+      );
     const { secretKey } = await S.getStripeSecrets(mode);
     const customer = await ensureCustomer(U, S, mode, secretKey, context.userId);
+    let purchaseId: string | undefined;
+    if (plan.billing_type === "one_time") {
+      const { data: purchase, error } = await db
+        .from("prepaid_purchases")
+        .insert({
+          user_id: context.userId,
+          plan_id: plan.id,
+          mode,
+          stripe_customer_id: customer,
+          stripe_price_id: priceId,
+          amount_cents: plan.price_cents!,
+          currency: plan.currency,
+          billing_interval: plan.billing_interval,
+          credits: plan.credits_per_cycle,
+          features: plan.allowed_features,
+          models: plan.allowed_models,
+          max_batch: plan.max_batch,
+        })
+        .select("id")
+        .single();
+      if (error || !purchase) throw new Error("Não foi possível iniciar a compra avulsa.");
+      purchaseId = purchase.id;
+    }
+    const metadata = {
+      user_id: context.userId,
+      plan_id: plan.id,
+      ...(purchaseId ? { purchase_id: purchaseId } : {}),
+    };
     const base = origin();
     const session = await S.stripeRequest(secretKey, "POST", "/v1/checkout/sessions", {
-      mode: "subscription",
+      mode: purchaseId ? "payment" : "subscription",
       customer,
       client_reference_id: context.userId,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${base}/planos?checkout=retorno&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${base}/planos?checkout=cancelado`,
-      metadata: { user_id: context.userId, plan_id: plan.id },
-      subscription_data: { metadata: { user_id: context.userId, plan_id: plan.id } },
+      metadata,
+      subscription_data: purchaseId ? undefined : { metadata },
+      payment_intent_data: purchaseId ? { metadata } : undefined,
+      invoice_creation: purchaseId ? { enabled: true, invoice_data: { metadata } } : undefined,
       locale: "pt-BR",
     });
+    if (purchaseId) {
+      const { error } = await db
+        .from("prepaid_purchases")
+        .update({ stripe_session_id: session.id })
+        .eq("id", purchaseId);
+      if (error)
+        throw new Error("Não foi possível vincular a sessão de pagamento. Tente novamente.");
+    }
     await U.audit({
       actor_id: context.userId,
       action: "checkout_created",
@@ -122,6 +165,7 @@ export const syncCheckoutSession = createServerFn({ method: "POST" })
       if (latest)
         await S.syncInvoice(mode, secretKey, typeof latest === "string" ? latest : latest.id);
     }
+    if (session.mode === "payment") await S.syncOneTimeCheckout(mode, secretKey, session.id);
     const access = await U.getAccess(context.userId);
     return {
       sessionStatus: session.status as string,
@@ -180,6 +224,10 @@ async function planChangeContext(context: { userId: string }, planId: string) {
     .eq("id", planId)
     .single();
   if (!target || target.status !== "active") throw new Error("Plano indisponível.");
+  if (target.billing_type === "one_time")
+    throw new Error(
+      "Um plano avulso não pode substituir uma assinatura. Cancele a renovação e aguarde o período atual terminar.",
+    );
   const priceId = mode === "test" ? target.stripe_price_id_test : target.stripe_price_id_live;
   if (!priceId) throw new Error("O plano de destino não tem preço configurado.");
   const { data: current } = await U.supabaseAdmin

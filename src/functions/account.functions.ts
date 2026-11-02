@@ -25,12 +25,12 @@ export const getMe = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const planId = sub?.plan_id ?? profile.data?.selected_plan_id ?? null;
+    const planId = access.plan_id ?? sub?.plan_id ?? profile.data?.selected_plan_id ?? null;
     const { data: plan } = planId
       ? await db
           .from("plans")
           .select(
-            "id, name, credits_per_cycle, max_batch, allowed_features, allowed_models, price_cents, billing_interval, status",
+            "id, name, credits_per_cycle, max_batch, allowed_features, allowed_models, price_cents, billing_interval, billing_type, status",
           )
           .eq("id", planId)
           .maybeSingle()
@@ -97,7 +97,7 @@ export const listPublicPlans = createServerFn({ method: "GET" }).handler(async (
   const { data } = await U.supabaseAdmin
     .from("plans")
     .select(
-      "id, name, description, price_cents, currency, billing_interval, credits_per_cycle, allowed_features, max_batch, highlight, sort_order, stripe_price_id_test, stripe_price_id_live",
+      "id, name, description, price_cents, currency, billing_interval, billing_type, credits_per_cycle, allowed_features, max_batch, highlight, sort_order, stripe_price_id_test, stripe_price_id_live",
     )
     .eq("status", "active")
     .order("sort_order");
