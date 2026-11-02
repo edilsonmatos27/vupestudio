@@ -52,6 +52,7 @@ function Subscribers() {
                 <th>Plano</th>
                 <th>Situação</th>
                 <th>Teste até</th>
+                <th>Acesso pago até</th>
                 <th>Saldo</th>
                 <th>Reservas</th>
               </tr>
@@ -75,24 +76,21 @@ function Subscribers() {
                   </td>
                   <td>{s.email}</td>
                   <td>{formatDate(s.created_at, false)}</td>
-                  <td>{s.plan}</td>
+                  <td>
+                    {s.plan}
+                    {s.billing_type === "one_time" && (
+                      <span className="ml-2 text-xs text-muted-foreground">Avulso</span>
+                    )}
+                  </td>
                   <td>
                     {s.status === "blocked" ? (
                       <StatusBadge status="blocked" />
                     ) : (
-                      <StatusBadge
-                        status={
-                          s.access_state ??
-                          (s.trial_ends_at && new Date(s.trial_ends_at) > new Date()
-                            ? "trial"
-                            : s.trial_ends_at
-                              ? "trial_expired"
-                              : "no_access")
-                        }
-                      />
+                      <StatusBadge status={s.access_state} />
                     )}
                   </td>
                   <td>{formatDate(s.trial_ends_at)}</td>
+                  <td>{formatDate(s.paid_through)}</td>
                   <td>{s.available}</td>
                   <td>{s.reserved}</td>
                 </tr>

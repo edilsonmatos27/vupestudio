@@ -430,29 +430,27 @@ export const adminListSubscribers = createServerFn({ method: "GET" })
       );
     const { data: profiles } = await q;
     const ids = (profiles ?? []).map((p) => p.id);
-    const mode = (await U.getSettings()).stripe_mode;
-    const [plans, trials, subs, roles] = await Promise.all([
+    const [plans, trials, roles] = await Promise.all([
       db.from("plans").select("id, name"),
       db.from("trials").select("user_id, ends_at, snapshot").in("user_id", ids),
-      db
-        .from("subscriptions")
-        .select("user_id, access_state, paid_through, plan_id")
-        .eq("mode", mode)
-        .in("user_id", ids),
       db.from("user_roles").select("user_id, role").in("user_id", ids),
     ]);
     const rows = await Promise.all(
       (profiles ?? []).map(async (p) => {
-        const bal = await db.rpc("credit_balance", { _uid: p.id });
+        const [bal, access] = await Promise.all([
+          db.rpc("credit_balance", { _uid: p.id }),
+          U.getAccess(p.id),
+        ]);
         const b = (bal.data as any[])?.[0] ?? { available: 0, reserved: 0 };
         const tr = trials.data?.find((t) => t.user_id === p.id);
-        const sub = subs.data?.find((s) => s.user_id === p.id);
         return {
           ...p,
-          plan: plans.data?.find((x) => x.id === (sub?.plan_id ?? p.selected_plan_id))?.name ?? "—",
+          plan:
+            plans.data?.find((x) => x.id === (access.plan_id ?? p.selected_plan_id))?.name ?? "—",
           trial_ends_at: (tr?.snapshot as any)?.granted ? tr?.ends_at : null,
-          access_state: sub?.access_state ?? null,
-          paid_through: sub?.paid_through ?? null,
+          access_state: access.code,
+          billing_type: access.billing_type ?? null,
+          paid_through: access.code === "paid" ? (access.paid_through ?? null) : null,
           is_admin: !!roles.data?.some((r) => r.user_id === p.id && r.role === "admin"),
           available: b.available,
           reserved: b.reserved,
