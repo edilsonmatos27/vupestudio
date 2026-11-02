@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Loader2, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Loader2,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Archive,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/states";
@@ -37,6 +46,7 @@ import {
 import {
   adminListPlans,
   adminDeletePlan,
+  adminArchivePlan,
   adminReorderPlans,
   adminSavePlan,
   adminSetPlanStatus,
@@ -97,6 +107,7 @@ function AdminPlans() {
   const [form, setForm] = useState<Form | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
+  const [pendingArchive, setPendingArchive] = useState<{ id: string; name: string } | null>(null);
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["admin-plans"] });
     qc.invalidateQueries({ queryKey: ["public-plans"] });
@@ -134,6 +145,21 @@ function AdminPlans() {
       refresh();
     } catch (e) {
       toast.error(errorMessage(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const archivePlan = async () => {
+    if (!pendingArchive || busy) return;
+    setBusy("archive");
+    try {
+      await adminArchivePlan({ data: { id: pendingArchive.id } });
+      toast.success("Plano arquivado e retirado da lista.");
+      setPendingArchive(null);
+      refresh();
+    } catch (error) {
+      toast.error(errorMessage(error));
     } finally {
       setBusy(null);
     }
@@ -337,6 +363,15 @@ function AdminPlans() {
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={!!busy}
+                  onClick={() => setPendingArchive({ id: p.id, name: p.name })}
+                  aria-label={`Arquivar plano ${p.name}`}
+                >
+                  <Archive /> Arquivar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   className="text-destructive hover:text-destructive"
                   disabled={!!busy}
                   onClick={() => setPendingDelete({ id: p.id, name: p.name })}
@@ -360,7 +395,7 @@ function AdminPlans() {
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. Apenas planos desativados ou em rascunho, sem
               cadastros, histórico, agentes vinculados ou preços publicados na Stripe, podem ser
-              excluídos. Para planos em uso, utilize Desativar.
+              excluídos. Para retirar planos publicados ou com histórico da lista, utilize Arquivar.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -374,6 +409,34 @@ function AdminPlans() {
               }}
             >
               {busy === "delete" && <Loader2 className="animate-spin" />} Excluir plano
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!pendingArchive}
+        onOpenChange={(open) => !open && busy !== "archive" && setPendingArchive(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Arquivar o plano “{pendingArchive?.name}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O plano será retirado desta lista e deixará de aceitar novas adesões. Pagamentos,
+              créditos e períodos já comprados serão preservados. Arquivar não cancela a renovação
+              de assinaturas existentes na Stripe.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === "archive"}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!!busy}
+              onClick={(event) => {
+                event.preventDefault();
+                void archivePlan();
+              }}
+            >
+              {busy === "archive" && <Loader2 className="animate-spin" />} Arquivar plano
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

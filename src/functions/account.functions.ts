@@ -100,6 +100,7 @@ export const listPublicPlans = createServerFn({ method: "GET" }).handler(async (
       "id, name, description, price_cents, currency, billing_interval, billing_type, credits_per_cycle, allowed_features, max_batch, highlight, sort_order, stripe_price_id_test, stripe_price_id_live",
     )
     .eq("status", "active")
+    .is("archived_at", null)
     .order("sort_order");
   return (data ?? []).map(({ stripe_price_id_test, stripe_price_id_live, ...p }) => ({
     ...p,

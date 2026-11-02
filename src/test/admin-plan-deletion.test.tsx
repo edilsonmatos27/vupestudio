@@ -6,12 +6,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const api = vi.hoisted(() => ({
   list: vi.fn(),
   remove: vi.fn(),
+  archive: vi.fn(),
   success: vi.fn(),
   error: vi.fn(),
 }));
 vi.mock("@/functions/plans.functions", () => ({
   adminListPlans: api.list,
   adminDeletePlan: api.remove,
+  adminArchivePlan: api.archive,
   adminReorderPlans: vi.fn(),
   adminSavePlan: vi.fn(),
   adminSetPlanStatus: vi.fn(),
@@ -96,5 +98,37 @@ describe("admin delete plan confirmation", () => {
     expect(within(dialog).getByRole("button", { name: "Excluir plano" })).toBeEnabled();
     expect(api.success).not.toHaveBeenCalled();
     expect(api.list).toHaveBeenCalledOnce();
+  });
+});
+
+describe("admin archive published plan confirmation", () => {
+  it("allows archiving a Stripe-published plan only after confirmation", async () => {
+    api.list.mockResolvedValue({
+      plans: [{ ...plan, status: "inactive", stripe_price_id_test: "price_fixture" }],
+      prices: [],
+      mode: "test",
+    });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Page = Route.options.component as ComponentType;
+    render(
+      <QueryClientProvider client={client}>
+        <Page />
+      </QueryClientProvider>,
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Arquivar plano Plano experimental" }),
+    );
+    let dialog = await screen.findByRole("alertdialog");
+    expect(within(dialog).getByText(/não cancela a renovação/)).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancelar" }));
+    expect(api.archive).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Arquivar plano Plano experimental" }));
+    dialog = await screen.findByRole("alertdialog");
+    api.archive.mockResolvedValue({ ok: true });
+    api.list.mockResolvedValue({ plans: [], prices: [], mode: "test" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Arquivar plano" }));
+    await screen.findByText("Nenhum plano");
+    expect(api.archive).toHaveBeenCalledExactlyOnceWith({ data: { id: plan.id } });
+    expect(api.remove).not.toHaveBeenCalled();
   });
 });

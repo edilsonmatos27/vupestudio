@@ -13,7 +13,11 @@ export const adminListPlans = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const U = await adminCtx(context);
-    const { data } = await U.supabaseAdmin.from("plans").select("*").order("sort_order");
+    const { data } = await U.supabaseAdmin
+      .from("plans")
+      .select("*")
+      .is("archived_at", null)
+      .order("sort_order");
     const { data: prices } = await U.supabaseAdmin
       .from("plan_prices")
       .select("*")
@@ -50,7 +54,12 @@ export const adminSavePlan = createServerFn({ method: "POST" })
     const U = await adminCtx(context);
     const { id, ...fields } = data;
     if (id) {
-      const { data: prev } = await U.supabaseAdmin.from("plans").select("*").eq("id", id).single();
+      const { data: prev } = await U.supabaseAdmin
+        .from("plans")
+        .select("*")
+        .eq("id", id)
+        .is("archived_at", null)
+        .single();
       if (!prev) throw new Error("Plano não encontrado.");
       const priceChanged =
         prev.price_cents !== fields.price_cents ||
@@ -66,6 +75,7 @@ export const adminSavePlan = createServerFn({ method: "POST" })
         .from("plans")
         .update(patch as never)
         .eq("id", id)
+        .is("archived_at", null)
         .select("*")
         .single();
       if (error) throw new Error("Falha ao salvar o plano.");
@@ -110,6 +120,7 @@ export const adminSetPlanStatus = createServerFn({ method: "POST" })
       .from("plans")
       .update({ status: data.status })
       .eq("id", data.id)
+      .is("archived_at", null)
       .select("*")
       .single();
     if (error) throw new Error("Falha ao alterar o status.");
@@ -132,7 +143,33 @@ export const adminReorderPlans = createServerFn({ method: "POST" })
       await U.supabaseAdmin
         .from("plans")
         .update({ sort_order: i + 1 })
-        .eq("id", data.ids[i]!);
+        .eq("id", data.ids[i]!)
+        .is("archived_at", null);
+    return { ok: true };
+  });
+
+/** Hide an offer and block new sales; existing paid access and billing keep their records. */
+export const adminArchivePlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const U = await adminCtx(context);
+    const { data: saved, error } = await U.supabaseAdmin
+      .from("plans")
+      .update({ archived_at: new Date().toISOString(), status: "inactive" })
+      .eq("id", data.id)
+      .is("archived_at", null)
+      .select("id, name")
+      .maybeSingle();
+    if (error) throw new Error("Não foi possível arquivar o plano. Tente novamente.");
+    if (!saved) throw new Error("Plano não encontrado ou já arquivado. Atualize a lista.");
+    await U.audit({
+      actor_id: context.userId,
+      action: "plan_archived",
+      target_type: "plan",
+      target_id: saved.id,
+      details: { name: saved.name },
+    });
     return { ok: true };
   });
 
@@ -152,7 +189,7 @@ export const adminDeletePlan = createServerFn({ method: "POST" })
     if (plan.status === "active") throw new Error("Desative o plano antes de excluí-lo.");
     if (plan.stripe_price_id_test || plan.stripe_price_id_live)
       throw new Error(
-        "Este plano já foi publicado na Stripe. Mantenha-o desativado para preservar pagamentos e assinaturas.",
+        "Este plano já foi publicado na Stripe. Use Arquivar para retirá-lo da lista e preservar pagamentos e assinaturas.",
       );
 
     // Check both Stripe environments and historical links. These UUID columns do
@@ -171,7 +208,7 @@ export const adminDeletePlan = createServerFn({ method: "POST" })
       throw new Error("Não foi possível verificar os vínculos do plano. Tente novamente.");
     if (links.some((link) => link.data?.length))
       throw new Error(
-        "Este plano possui cadastros, histórico, agentes vinculados ou preços na Stripe. Mantenha-o desativado em vez de excluí-lo.",
+        "Este plano possui cadastros, histórico, agentes vinculados ou preços na Stripe. Use Arquivar para retirá-lo da lista sem apagar o histórico.",
       );
 
     // Refuse deletion if another admin edits/reactivates the plan during checks.
@@ -208,6 +245,7 @@ export const adminSyncPlanStripe = createServerFn({ method: "POST" })
       .from("plans")
       .select("*")
       .eq("id", data.id)
+      .is("archived_at", null)
       .single();
     if (!plan) throw new Error("Plano não encontrado.");
     if (plan.price_cents === null || plan.price_cents <= 0)

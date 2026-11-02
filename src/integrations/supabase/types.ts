@@ -657,6 +657,7 @@ export type Database = {
       }
       plans: {
         Row: {
+          archived_at: string | null
           allowed_features: string[]
           allowed_models: string[]
           billing_type: string
@@ -680,6 +681,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived_at?: string | null
           allowed_features?: string[]
           allowed_models?: string[]
           billing_type?: string
@@ -703,6 +705,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived_at?: string | null
           allowed_features?: string[]
           allowed_models?: string[]
           billing_type?: string
