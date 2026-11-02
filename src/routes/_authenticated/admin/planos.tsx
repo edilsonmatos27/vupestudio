@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Loader2, Pencil, Plus, RefreshCw } from "lucide-react";
+import { ArrowDown, ArrowUp, Loader2, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState, PageHeader, StatusBadge } from "@/components/states";
@@ -10,6 +10,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -26,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   adminListPlans,
+  adminDeletePlan,
   adminReorderPlans,
   adminSavePlan,
   adminSetPlanStatus,
@@ -82,6 +93,7 @@ function AdminPlans() {
   const q = useQuery({ queryKey: ["admin-plans"], queryFn: () => adminListPlans() });
   const [form, setForm] = useState<Form | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["admin-plans"] });
     qc.invalidateQueries({ queryKey: ["public-plans"] });
@@ -106,6 +118,21 @@ function AdminPlans() {
       trial_minutes: String(t?.duration_minutes ?? 4320),
       trial_credits: String(t?.credits ?? 10),
     });
+  };
+
+  const deletePlan = async () => {
+    if (!pendingDelete || busy) return;
+    setBusy("delete");
+    try {
+      await adminDeletePlan({ data: { id: pendingDelete.id } });
+      toast.success("Plano excluído.");
+      setPendingDelete(null);
+      refresh();
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally {
+      setBusy(null);
+    }
   };
 
   const save = async () => {
@@ -299,11 +326,50 @@ function AdminPlans() {
                 <Button size="icon" variant="ghost" onClick={() => openEdit(p)} aria-label="Editar">
                   <Pencil />
                 </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-destructive hover:text-destructive"
+                  disabled={!!busy}
+                  onClick={() => setPendingDelete({ id: p.id, name: p.name })}
+                  aria-label={`Excluir plano ${p.name}`}
+                >
+                  <Trash2 /> Excluir
+                </Button>
               </div>
             );
           })}
         </div>
       )}
+
+      <AlertDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => !open && busy !== "delete" && setPendingDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir o plano “{pendingDelete?.name}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Apenas planos desativados ou em rascunho, sem
+              cadastros, histórico, agentes vinculados ou preços publicados na Stripe, podem ser
+              excluídos. Para planos em uso, utilize Desativar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === "delete"}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              disabled={!!busy}
+              onClick={(event) => {
+                event.preventDefault();
+                void deletePlan();
+              }}
+            >
+              {busy === "delete" && <Loader2 className="animate-spin" />} Excluir plano
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={!!form} onOpenChange={(o) => !o && setForm(null)}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">

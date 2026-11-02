@@ -134,6 +134,64 @@ export const adminReorderPlans = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminDeletePlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const U = await adminCtx(context);
+    const db = U.supabaseAdmin;
+    const { data: plan, error: readError } = await db
+      .from("plans")
+      .select("id, name, status, updated_at, stripe_price_id_test, stripe_price_id_live")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (readError) throw new Error("Não foi possível verificar o plano. Tente novamente.");
+    if (!plan) throw new Error("Plano não encontrado. Atualize a lista.");
+    if (plan.status === "active") throw new Error("Desative o plano antes de excluí-lo.");
+    if (plan.stripe_price_id_test || plan.stripe_price_id_live)
+      throw new Error(
+        "Este plano já foi publicado na Stripe. Mantenha-o desativado para preservar pagamentos e assinaturas.",
+      );
+
+    // Check both Stripe environments and historical links. These UUID columns do
+    // not have foreign keys; deleting a used plan would break access/history.
+    const links = await Promise.all([
+      db.from("profiles").select("id").eq("selected_plan_id", data.id).limit(1),
+      db.from("trials").select("user_id").eq("plan_id", data.id).limit(1),
+      db.from("subscriptions").select("id").eq("plan_id", data.id).limit(1),
+      db.from("invoices").select("id").eq("plan_id", data.id).limit(1),
+      db.from("agents").select("id").contains("allowed_plan_ids", [data.id]).limit(1),
+      // Old Stripe prices remain relevant even after the plan's price changes.
+      db.from("plan_prices").select("id").eq("plan_id", data.id).limit(1),
+    ]);
+    if (links.some((link) => link.error))
+      throw new Error("Não foi possível verificar os vínculos do plano. Tente novamente.");
+    if (links.some((link) => link.data?.length))
+      throw new Error(
+        "Este plano possui cadastros, histórico, agentes vinculados ou preços na Stripe. Mantenha-o desativado em vez de excluí-lo.",
+      );
+
+    // Refuse deletion if another admin edits/reactivates the plan during checks.
+    const { data: deleted, error } = await db
+      .from("plans")
+      .delete()
+      .eq("id", plan.id)
+      .eq("status", plan.status)
+      .eq("updated_at", plan.updated_at)
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Não foi possível excluir o plano. Tente novamente.");
+    if (!deleted) throw new Error("O plano foi alterado. Atualize a lista e tente novamente.");
+    await U.audit({
+      actor_id: context.userId,
+      action: "plan_deleted",
+      target_type: "plan",
+      target_id: plan.id,
+      details: { name: plan.name, status: plan.status },
+    });
+    return { ok: true };
+  });
+
 /** Creates (or reuses) the Stripe product and a new price for the plan's current amount. */
 export const adminSyncPlanStripe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
