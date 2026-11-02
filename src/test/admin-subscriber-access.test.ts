@@ -109,3 +109,13 @@ describe("admin subscriber access display", () => {
     expect(db.from).not.toHaveBeenCalled();
   });
 });
+
+it("shows the manual access expiry without presenting it as a paid subscription", async () => {
+  db.getAccess.mockResolvedValue({ code: "manual", plan_id: "paid-plan", manual_ends_at: end });
+  expect((await run())[0]).toMatchObject({
+    access_state: "manual",
+    plan: "Pro",
+    paid_through: end,
+    billing_type: null,
+  });
+});

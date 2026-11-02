@@ -15,6 +15,7 @@
 - Access decisions (trial, paid period, block) come only from the SQL function `public.access_state` using the DB clock; UI timers are informative.
 - Credits are buckets + reservations + ledger in SQL functions (`reserve_operation_credits`, `consume_reservation`, `release_reservation`, `grant_credits`, `apply_invoice_credits`, `admin_adjust_credits`) callable only by service_role; never update balances from app code.
 - Paid entitlement (plan_id, paid_through, credits) changes only from a Stripe invoice re-fetched server-side and marked `paid`; subscription sync alone never grants access.
+- Admin courtesy access is separate from paid entitlement: `manual_access_grants`, service-role-only grant/revoke RPCs with admin verification and audit, expiring credit buckets, and SQL `access_state` code `manual`. Never fabricate a Stripe invoice or subscription for a courtesy.
 - Stripe uses the admin's own keys stored AES-GCM-encrypted in `stripe_credentials` (key from `VUPE_SECRETS_KEY`), REST calls pinned to API version 2024-06-20; test and live data are separated by a `mode` column.
 - Image AI runs only server-side through the Lovable AI Gateway; the verified model catalog and capabilities live in `src/lib/models.ts` (shared, no secrets).
 - Agent base prompts live only in `agent_versions` (service_role only) and are referenced by `operations.agent_version_id`; never return them to subscriber flows.

@@ -35,6 +35,12 @@ export function AccessBanner() {
   }, [cd?.expired, refetch]);
   if (!me || me.isAdmin) return null;
   const code = me.access.code;
+  if (code === "manual")
+    return (
+      <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+        Acesso liberado pelo administrador até {formatDate(me.access.manual_ends_at)}.
+      </div>
+    );
   if (code === "trial" && cd) {
     return (
       <div className="mb-6 flex flex-col gap-3 rounded-2xl border bg-accent/60 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">

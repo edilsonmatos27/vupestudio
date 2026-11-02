@@ -655,6 +655,12 @@ export type Database = {
         Update: { stripe_session_id?: string | null; status?: string }
         Relationships: []
       }
+      manual_access_grants: {
+        Row: { id: string; user_id: string; plan_id: string; mode: string; credits: number; features: string[]; models: string[]; max_batch: number; reason: string; granted_by: string; created_at: string; expires_at: string; revoked_at: string | null; revoked_by: string | null }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       plans: {
         Row: {
           archived_at: string | null
@@ -1020,6 +1026,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      grant_manual_access: { Args: { _id: string; _uid: string; _plan: string; _days: number; _credits: number; _reason: string; _actor: string }; Returns: string }
+      revoke_manual_access: { Args: { _id: string; _actor: string }; Returns: undefined }
       apply_prepaid_invoice: { Args: { _purchase: string; _invoice: string }; Returns: string }
       revoke_prepaid_invoice: { Args: { _invoice: string; _reason: string; _purchase?: string }; Returns: string }
       _lock_user: { Args: { _uid: string }; Returns: undefined }

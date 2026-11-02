@@ -90,13 +90,15 @@ function Dashboard() {
     ? "Admin master"
     : me?.access.code === "trial"
       ? `Em teste · restam ${cd?.label ?? "…"}`
-      : me?.access.code === "paid"
-        ? `${me.access.billing_type === "one_time" ? "Acesso avulso" : "Assinatura ativa"} até ${formatDate(me.access.paid_through, false)}`
-        : me?.access.code === "trial_expired"
-          ? "Teste encerrado"
-          : me?.access.code === "blocked"
-            ? "Conta bloqueada"
-            : "Sem assinatura";
+      : me?.access.code === "manual"
+        ? `Acesso manual até ${formatDate(me.access.manual_ends_at, false)}`
+        : me?.access.code === "paid"
+          ? `${me.access.billing_type === "one_time" ? "Acesso avulso" : "Assinatura ativa"} até ${formatDate(me.access.paid_through, false)}`
+          : me?.access.code === "trial_expired"
+            ? "Teste encerrado"
+            : me?.access.code === "blocked"
+              ? "Conta bloqueada"
+              : "Sem assinatura";
 
   return (
     <div>

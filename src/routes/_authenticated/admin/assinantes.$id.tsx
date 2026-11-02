@@ -1,3 +1,4 @@
+import { ManualAccessPanel } from "@/components/manual-access-panel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -113,6 +114,13 @@ function Detail() {
       <p className="mt-3 text-xs text-muted-foreground">
         Desbloquear a conta não confirma pagamento nem transforma teste vencido em assinatura paga.
       </p>
+
+      <ManualAccessPanel
+        userId={id}
+        blocked={blocked}
+        defaultPlanId={d.access.plan_id ?? d.profile?.selected_plan_id}
+        grants={d.manualGrants}
+      />
 
       <h2 className="mb-2 mt-8 text-lg font-semibold">Assinaturas</h2>
       {!d.subscriptions.length ? (

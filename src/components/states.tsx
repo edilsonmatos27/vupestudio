@@ -88,6 +88,7 @@ export function StatusBadge({ status }: { status: string }) {
     inactive: ["Inativo", "bg-secondary text-muted-foreground"],
     draft: ["Rascunho", "bg-secondary text-muted-foreground"],
     blocked: ["Bloqueado", "bg-destructive/10 text-destructive"],
+    manual: ["Acesso manual", "bg-primary/15 text-primary"],
     paid: ["Pago", "bg-success/15 text-success"],
     open: ["Em aberto", "bg-warning/20 text-warning-foreground"],
     void: ["Anulada", "bg-secondary text-muted-foreground"],

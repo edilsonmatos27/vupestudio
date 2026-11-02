@@ -203,6 +203,7 @@ export const adminDeletePlan = createServerFn({ method: "POST" })
       // Old Stripe prices remain relevant even after the plan's price changes.
       db.from("plan_prices").select("id").eq("plan_id", data.id).limit(1),
       db.from("prepaid_purchases").select("id").eq("plan_id", data.id).limit(1),
+      db.from("manual_access_grants").select("id").eq("plan_id", data.id).limit(1),
     ]);
     if (links.some((link) => link.error))
       throw new Error("Não foi possível verificar os vínculos do plano. Tente novamente.");

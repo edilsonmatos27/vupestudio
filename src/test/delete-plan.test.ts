@@ -133,6 +133,7 @@ describe("admin plan deletion", () => {
     "agents",
     "plan_prices",
     "prepaid_purchases",
+    "manual_access_grants",
   ])("preserves plans referenced by %s (including historical prices)", async (table) => {
     linkTable = table;
     await expect(run()).rejects.toThrow("vinculados ou preços");

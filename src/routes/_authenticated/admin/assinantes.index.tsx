@@ -52,7 +52,7 @@ function Subscribers() {
                 <th>Plano</th>
                 <th>Situação</th>
                 <th>Teste até</th>
-                <th>Acesso pago até</th>
+                <th>Acesso até</th>
                 <th>Saldo</th>
                 <th>Reservas</th>
               </tr>

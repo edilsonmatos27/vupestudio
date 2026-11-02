@@ -53,13 +53,23 @@ export async function audit(entry: {
 
 export type Access = {
   ok: boolean;
-  code: "admin" | "paid" | "trial" | "trial_expired" | "no_access" | "blocked" | "no_profile";
+  code:
+    | "admin"
+    | "paid"
+    | "manual"
+    | "trial"
+    | "trial_expired"
+    | "no_access"
+    | "blocked"
+    | "no_profile";
   is_admin?: boolean;
   plan_id?: string;
   features?: string[];
   models?: string[];
   max_batch?: number;
   trial_ends_at?: string;
+  manual_ends_at?: string;
+  manual_grant_id?: string;
   paid_through?: string;
   billing_type?: "recurring" | "one_time";
   reason?: string;

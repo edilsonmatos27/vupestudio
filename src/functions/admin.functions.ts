@@ -450,7 +450,12 @@ export const adminListSubscribers = createServerFn({ method: "GET" })
           trial_ends_at: (tr?.snapshot as any)?.granted ? tr?.ends_at : null,
           access_state: access.code,
           billing_type: access.billing_type ?? null,
-          paid_through: access.code === "paid" ? (access.paid_through ?? null) : null,
+          paid_through:
+            access.code === "manual"
+              ? (access.manual_ends_at ?? null)
+              : access.code === "paid"
+                ? (access.paid_through ?? null)
+                : null,
           is_admin: !!roles.data?.some((r) => r.user_id === p.id && r.role === "admin"),
           available: b.available,
           reserved: b.reserved,
@@ -466,36 +471,46 @@ export const adminSubscriberDetail = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const U = await adminCtx(context);
     const db = U.supabaseAdmin;
-    const [profile, trial, subs, invoices, ledger, bal, access, audits] = await Promise.all([
-      db.from("profiles").select("*").eq("id", data.id).single(),
-      db.from("trials").select("*").eq("user_id", data.id).maybeSingle(),
-      db
-        .from("subscriptions")
-        .select("*")
-        .eq("user_id", data.id)
-        .order("created_at", { ascending: false }),
-      db
-        .from("invoices")
-        .select("*")
-        .eq("user_id", data.id)
-        .order("created_at", { ascending: false })
-        .limit(50),
-      db
-        .from("credit_ledger")
-        .select("*")
-        .eq("user_id", data.id)
-        .order("created_at", { ascending: false })
-        .limit(100),
-      db.rpc("credit_balance", { _uid: data.id }),
-      U.getAccess(data.id),
-      db
-        .from("audit_log")
-        .select("*")
-        .eq("target_id", data.id)
-        .order("created_at", { ascending: false })
-        .limit(50),
-    ]);
+    const mode = (await U.getSettings()).stripe_mode;
+    const [profile, trial, subs, invoices, ledger, bal, access, audits, manualGrants] =
+      await Promise.all([
+        db.from("profiles").select("*").eq("id", data.id).single(),
+        db.from("trials").select("*").eq("user_id", data.id).maybeSingle(),
+        db
+          .from("subscriptions")
+          .select("*")
+          .eq("user_id", data.id)
+          .order("created_at", { ascending: false }),
+        db
+          .from("invoices")
+          .select("*")
+          .eq("user_id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        db
+          .from("credit_ledger")
+          .select("*")
+          .eq("user_id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(100),
+        db.rpc("credit_balance", { _uid: data.id }),
+        U.getAccess(data.id),
+        db
+          .from("audit_log")
+          .select("*")
+          .eq("target_id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        db
+          .from("manual_access_grants")
+          .select("*")
+          .eq("user_id", data.id)
+          .eq("mode", mode)
+          .order("created_at", { ascending: false })
+          .limit(20),
+      ]);
     return {
+      manualGrants: manualGrants.data ?? [],
       profile: profile.data,
       trial: trial.data,
       subscriptions: subs.data ?? [],
@@ -617,4 +632,45 @@ export const adminRecentEvents = createServerFn({ method: "GET" })
       .order("received_at", { ascending: false })
       .limit(50);
     return data ?? [];
+  });
+
+export const adminGrantManualAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        userId: z.string().uuid(),
+        planId: z.string().uuid(),
+        days: z.number().int().min(1).max(3650),
+        credits: z.number().int().min(0).max(1000000),
+        reason: z.string().trim().min(3).max(300),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const U = await adminCtx(context);
+    const { error } = await U.supabaseAdmin.rpc("grant_manual_access", {
+      _id: data.id,
+      _uid: data.userId,
+      _plan: data.planId,
+      _days: data.days,
+      _credits: data.credits,
+      _reason: data.reason,
+      _actor: context.userId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+export const adminRevokeManualAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const U = await adminCtx(context);
+    const { error } = await U.supabaseAdmin.rpc("revoke_manual_access", {
+      _id: data.id,
+      _actor: context.userId,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

@@ -47,6 +47,7 @@ const SOURCE: Record<string, string> = {
   prepaid: "Compra avulsa",
   upgrade: "Upgrade",
   manual: "Manual",
+  manual_access: "Acesso manual",
 };
 const KIND: Record<string, string> = {
   grant: "Concessão",

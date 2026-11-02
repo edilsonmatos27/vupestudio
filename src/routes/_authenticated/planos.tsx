@@ -228,7 +228,11 @@ function PlansPage() {
           <div className="rounded-3xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">Situação</p>
             <div className="mt-2">
-              <StatusBadge status={sub?.access_state ?? me.access.code} />
+              <StatusBadge
+                status={
+                  me.access.code === "manual" ? "manual" : (sub?.access_state ?? me.access.code)
+                }
+              />
             </div>
           </div>
           <div className="rounded-3xl border bg-card p-5">
@@ -237,16 +241,20 @@ function PlansPage() {
           </div>
           <div className="rounded-3xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">
-              {prepaidActive || sub?.cancel_at_period_end ? "Acesso até" : "Próxima renovação"}
+              {me.access.code === "manual" || prepaidActive || sub?.cancel_at_period_end
+                ? "Acesso até"
+                : "Próxima renovação"}
             </p>
             <p className="mt-1 font-display text-xl font-bold">
-              {prepaidActive && me?.access.paid_through
-                ? formatDate(me.access.paid_through, false)
-                : sub?.current_period_end
-                  ? formatDate(sub.current_period_end, false)
-                  : me.access.code === "trial"
-                    ? `Teste até ${formatDate(me.access.trial_ends_at, false)}`
-                    : "—"}
+              {me.access.code === "manual"
+                ? formatDate(me.access.manual_ends_at, false)
+                : prepaidActive && me?.access.paid_through
+                  ? formatDate(me.access.paid_through, false)
+                  : sub?.current_period_end
+                    ? formatDate(sub.current_period_end, false)
+                    : me.access.code === "trial"
+                      ? `Teste até ${formatDate(me.access.trial_ends_at, false)}`
+                      : "—"}
             </p>
           </div>
         </div>
